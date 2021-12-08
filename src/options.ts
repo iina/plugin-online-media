@@ -4,6 +4,9 @@ export const opt = {
   get exclude(): string {
     return preferences.get("excluded_urls");
   },
+  get ytdl_path(): string {
+      return preferences.get("ytdl_path");
+  },
   get try_ytdl_first(): boolean {
     return preferences.get("try_ytdl_first");
   },

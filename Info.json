@@ -12,6 +12,7 @@
   "permissions": ["show-osd", "file-system"],
   "preferencesPage": "pref.html",
   "preferenceDefaults": {
+    "ytdl_path": "",
     "excluded_urls": "",
     "try_ytdl_first": false,
     "use_manifests": false,

@@ -38,6 +38,16 @@
   </head>
   <body>
     <div class="pref-section">
+      Use customized youtube-dl/yt-dlp:
+      <div style="margin-top: 2px">
+        <input
+          type="string"
+          data-pref-key="ytdl_path"
+          style="width: 100%; margin-top: 2px"
+        />
+      </div>
+    </div>
+    <div class="pref-section">
       Default video and audio quality:
       <div style="margin-top: 4px; line-height: 24px">
         <div>
@@ -78,7 +88,7 @@
             />
             Custom youtube-dl format:</label
           >
-          <input type="text" data-pref-key="custom_ytdl_format" />
+          <input type="string" data-pref-key="custom_ytdl_format" />
         </div>
       </div>
     </div>

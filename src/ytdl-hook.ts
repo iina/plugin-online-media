@@ -72,7 +72,8 @@ export async function runYTDLHook(url: string) {
 
   try {
     console.log("Running youtube-dl...");
-    const out = await utils.exec("youtube-dl", args);
+    const path = opt.ytdl_path ? opt.ytdl_path : "youtube-dl";
+    const out = await utils.exec(path, args);
     if (out.status !== 0) {
       core.osd("Failed to run youtube-dl");
       console.error(`Error running youtube-dl: ${out.stderr}`);
