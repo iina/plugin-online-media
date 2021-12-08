@@ -1,0 +1,24 @@
+{
+  "name": "Online media support",
+  "identifier": "com.colliderli.ytdl",
+  "version": "0.1.0",
+  "description": "Official plugin for playing online media via youtube-dl",
+  "author": {
+    "name": "IINA Developers",
+    "email": "developers@iina.io",
+    "url": "https://iina.io"
+  },
+  "entry": "dist/index.js",
+  "permissions": ["show-osd", "file-system"],
+  "preferencesPage": "pref.html",
+  "preferenceDefaults": {
+    "excluded_urls": "",
+    "try_ytdl_first": false,
+    "use_manifests": false,
+    "raw_options": "",
+    "video_quality": "best",
+    "max_video_height": 1080,
+    "custom_ytdl_format": "",
+    "ytdl_format": ""
+  }
+}
