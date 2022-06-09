@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body {
+            font-size: 13px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+            user-select: none;
+        }
+
+        .download-item {
+            padding: 10px 10px 0 10px;
+        }
+
+        .filename {
+            font-weight: bold;
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        .progress {
+            color: rgba(0, 0, 0, .5);
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(0, 0, 0, .1);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            body {
+                color: #eee;
+            }
+
+            a {
+                color: #007aff;
+            }
+
+            .progress {
+                color: rgba(255, 255, 255, .5);
+                border-bottom: 1px solid rgba(255, 255, 255, .1);
+            }
+        }
+    </style>
+    <script src="dist/downloads-window.js"></script>
+</head>
+
+<body>
+    <div id="content"></div>
+</body>
+
+</html>

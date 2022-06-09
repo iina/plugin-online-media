@@ -11,8 +11,8 @@
   "license": "ISC",
   "devDependencies": {
     "iina-plugin-definition": "^0.0.6",
-    "parcel": "^2.0.0-beta.2",
-    "prettier": "^2.2.1"
+    "parcel": "^2.6.0",
+    "prettier": "^2.6.2"
   },
   "entry": "src/index.js",
   "targets": {
@@ -21,6 +21,19 @@
       "distDir": "./dist/",
       "source": "src/index.ts",
       "isLibrary": false
+    },
+    "globalEntry": {
+      "distDir": "./dist/",
+      "source": "src/global.ts",
+      "isLibrary": false
+    },
+    "downloadsWindowEntry": {
+      "distDir": "./dist/",
+      "source": "src/downloads-window.js",
+      "isLibrary": false
     }
+  },
+  "dependencies": {
+    "mustache": "^4.2.0"
   }
 }

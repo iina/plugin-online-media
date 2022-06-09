@@ -1,15 +1,17 @@
 {
-  "name": "Online media support",
+  "name": "Online Media ",
   "identifier": "com.colliderli.ytdl",
   "version": "0.1.0",
-  "description": "Official plugin for playing online media via youtube-dl",
+  "description": "Official plugin for playing online media via yt-dlp / youtube-dl",
   "author": {
     "name": "IINA Developers",
     "email": "developers@iina.io",
     "url": "https://iina.io"
   },
   "entry": "dist/index.js",
-  "permissions": ["show-osd", "file-system"],
+  "globalEntry": "dist/global.js",
+  "permissions": ["show-osd", "file-system", "network-request"],
+  "allowedDomains": ["github.com"],
   "preferencesPage": "pref.html",
   "preferenceDefaults": {
     "ytdl_path": "",

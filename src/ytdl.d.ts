@@ -48,6 +48,7 @@ declare namespace YTDL {
     fragment_base_url?: string;
     protocol?: Protocol;
     http_headers?: Record<string, string>;
+    dynamic_range?: string;
     chapters: Chapter[];
 
     requested_subtitles?: Record<

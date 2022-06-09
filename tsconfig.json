@@ -1,17 +1,13 @@
 {
-    "compilerOptions": {
-      "lib": [
-        "es6",
-        "es7",
-        "esnext"
-      ],
-      "sourceMap": false,
-      "target": "esnext",
-      "module": "es6",
-      "typeRoots": [
-        "./node_modules/@types",
-        "./node_modules/iina-plugin-definition"
-      ],
-    },
-    "compileOnSave": false
-  }
+  "compilerOptions": {
+    "lib": ["es6", "es7", "esnext"],
+    "sourceMap": false,
+    "target": "esnext",
+    "module": "es6",
+    "typeRoots": [
+      "./node_modules/@types",
+      "./node_modules/iina-plugin-definition"
+    ]
+  },
+  "compileOnSave": false
+}

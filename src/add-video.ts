@@ -6,8 +6,9 @@ import {
   optionWasSetLocally,
 } from "./utils";
 import { opt } from "./options";
+import { currentURL } from "./ytdl-hook";
 
-const { console, mpv, menu } = iina;
+const { core, console, global, mpv, menu } = iina;
 
 interface Chapter {
   time: number;
@@ -19,7 +20,7 @@ export let isSwitchingFormat = false;
 let currentVideoFormat: string;
 let currentAudioFormat: string;
 
-function matchTime(line: string): number {
+function matchTime(line: string): number | null {
   const match = line.match(/((\d+):)?(\d\d?):(\d\d)/);
   if (!match) return null;
   const [, , a, b, c] = match;
@@ -201,6 +202,10 @@ function processVideo(reqfmts: YTDL.Video[], json?: YTDL.Entity) {
   mpv.set("file-local-options/stream-lavf-o", streamOpts);
 }
 
+function formatDescription(f: YTDL._BaseEntity): string {
+  return f.dynamic_range ? `${f.format} ${f.dynamic_range}` : f.format;
+}
+
 export function addVideo(json: YTDL.Entity) {
   let reqfmts = json.requested_formats;
 
@@ -220,16 +225,32 @@ export function addVideo(json: YTDL.Entity) {
         (f) => f.vcodec === "none",
       ).format_id;
     }
+
     // add to menu
     console.log("reconstruct menu");
+
     menu.removeAllItems();
+    menu.addItem(menu.separator());
+
+    menu.addItem(
+      menu.item(
+        "Download this video",
+        () => {
+          core.osd("Preparing for download");
+          global.postMessage("downloadVideo", currentURL);
+        },
+        { keyBinding: "Meta+d" },
+      ),
+    );
+
     const videoItem = menu.item("Video Quality");
     const audioItem = menu.item("Audio Quality");
+
     for (const f of json.formats) {
       if (f.vcodec === "none") {
         audioItem.addSubMenuItem(
           menu.item(
-            f.format,
+            formatDescription(f),
             () => {
               currentAudioFormat = f.format_id;
               isSwitchingFormat = true;
@@ -241,7 +262,7 @@ export function addVideo(json: YTDL.Entity) {
       } else {
         videoItem.addSubMenuItem(
           menu.item(
-            f.format,
+            formatDescription(f),
             () => {
               currentVideoFormat = f.format_id;
               isSwitchingFormat = true;
@@ -254,6 +275,7 @@ export function addVideo(json: YTDL.Entity) {
     }
     menu.addItem(videoItem);
     menu.addItem(audioItem);
+    menu.forceUpdate();
   }
 
   processVideo(reqfmts, json);

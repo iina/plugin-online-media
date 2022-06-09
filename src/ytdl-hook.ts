@@ -8,8 +8,11 @@ import {
 } from "./utils";
 import { addVideo, isSwitchingFormat } from "./add-video";
 import { opt } from "./options";
+import { findBinary } from "./binary";
 
 const { core, console, event, mpv, menu, utils } = iina;
+
+export let currentURL: string;
 
 interface TempOption {
   proxy: string | null;
@@ -31,12 +34,14 @@ export async function runYTDLHook(url: string) {
   };
 
   if (url.startsWith("ytdl://")) {
-    url = url.substr(8);
+    url = url.substring(7);
   }
+
+  currentURL = url;
 
   const args = [
     "--no-warnings",
-    "-J",
+    "--dump-single-json",
     "--flat-playlist",
     "--sub-format",
     "ass/srt/best",
@@ -52,7 +57,7 @@ export async function runYTDLHook(url: string) {
   const rawOptions = opt.rawOptions;
   rawOptions.split(" ").forEach((arg, index) => {
     if (arg.startsWith("--")) {
-      const argName = arg.substr(2);
+      const argName = arg.substring(2);
       const argValue = rawOptions[index + 1];
       if (argName === "sub-lang" && argValue) allsubs = true;
       else if (argName === "proxy" && argValue) option.proxy = argValue;
@@ -72,14 +77,20 @@ export async function runYTDLHook(url: string) {
 
   try {
     console.log("Running youtube-dl...");
-    const path = opt.ytdl_path ? opt.ytdl_path : "youtube-dl";
-    const out = await utils.exec(path, args);
+
+    // find the binary
+    const ytdl = findBinary();
+
+    // execute
+    const out = await utils.exec(ytdl, args);
     if (out.status !== 0) {
       core.osd("Failed to run youtube-dl");
       console.error(`Error running youtube-dl: ${out.stderr}`);
       return;
     }
     console.log("Finished running youtube-dl");
+
+    // parse the result
     try {
       let json = JSON.parse(out.stdout);
       console.log("Youtube-dl succeeded.");
@@ -132,7 +143,9 @@ function ytdlSuccess(url: string, json: YTDL.Entity, option: TempOption) {
         }
 
         // there might not be subs for the first segment
-        const entryWithSubs = json.entries.find((entry) => entry.requested_subtitles);
+        const entryWithSubs = json.entries.find(
+          (entry) => entry.requested_subtitles,
+        );
         if (entryWithSubs && entryWithSubs.duration) {
           const subs = entryWithSubs.requested_subtitles;
           Object.keys(subs).forEach((lang) => {
@@ -171,14 +184,19 @@ function ytdlSuccess(url: string, json: YTDL.Entity, option: TempOption) {
         }
 
         if (site.indexOf("://") < 0) {
-          const prefix = site.indexOf(":") >= 0 ? "ytdl://" : "https://youtu.be/";
+          const prefix =
+            site.indexOf(":") >= 0 ? "ytdl://" : "https://youtu.be/";
           playlist.push(`${prefix}${site}`);
         } else if (isSafeURL(site)) {
           playlist.push(site);
         }
       }
 
-      if (option.usePlaylist && optionWasSet("playlist-start") && playlistIndex) {
+      if (
+        option.usePlaylist &&
+        optionWasSet("playlist-start") &&
+        playlistIndex
+      ) {
         mpv.set("playlist-start", playlistIndex);
       }
 

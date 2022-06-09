@@ -5,7 +5,7 @@ export const opt = {
     return preferences.get("excluded_urls");
   },
   get ytdl_path(): string {
-      return preferences.get("ytdl_path");
+    return preferences.get("ytdl_path");
   },
   get try_ytdl_first(): boolean {
     return preferences.get("try_ytdl_first");
