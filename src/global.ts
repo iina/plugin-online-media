@@ -40,26 +40,12 @@ menu.addItem(
 
 // Downloads window
 
-standaloneWindow.onMessage("requestUpdate", ({ force }) => {
-  if (!force && !statusNeedUpdate) return;
-  updateDownloadsWindow();
-  resetStatusNeedUpdate();
-});
-
 global.onMessage("downloadVideo", async (url, player) => {
   if (url) {
     await downloadVideo(url.toString(), player);
     global.postMessage(player, "downloading", true);
     showDownloadsWindow();
   }
-});
-
-standaloneWindow.onMessage("openFile", ({ file }) => {
-  global.createPlayerInstance({ url: file });
-});
-
-standaloneWindow.onMessage("revealFile", ({ file }) => {
-  utils.exec("open", ["-R", file]);
 });
 
 export function updateDownloadsWindow() {
@@ -81,6 +67,21 @@ function showDownloadsWindow() {
     hideTitleBar: false,
   });
   standaloneWindow.setFrame(320, 400);
+
+  standaloneWindow.onMessage("requestUpdate", ({ force }) => {
+    if (!force && !statusNeedUpdate) return;
+    updateDownloadsWindow();
+    resetStatusNeedUpdate();
+  });
+
+  standaloneWindow.onMessage("openFile", ({ file }) => {
+    global.createPlayerInstance({ url: file });
+  });
+
+  standaloneWindow.onMessage("revealFile", ({ file }) => {
+    utils.exec("open", ["-R", file]);
+  });
+
   standaloneWindow.open();
 }
 
