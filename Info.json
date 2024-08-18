@@ -1,7 +1,9 @@
 {
-  "name": "Online Media ",
+  "name": "Online Media",
   "identifier": "com.colliderli.ytdl",
   "version": "0.1.0",
+  "ghRepo": "iina/plugin-online-media",
+  "ghVersion": 1,
   "description": "Official plugin for playing online media via yt-dlp / youtube-dl",
   "author": {
     "name": "IINA Developers",
