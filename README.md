@@ -15,9 +15,4 @@ npm i
 npm run build
 ```
 
-In order to load the plugin locally while developing new features,
-it's recommended to create a `iinaplugin-dev` symlink under the pluign folder:
-
-```
-ln -s PATH_TO_REPO/iina-plugin-ytdl ~/Library/Application\ Support/com.colliderli.iina/plugins/iina-plugin-ytdl.iinaplugin-dev
-```
+Please check out the [guide in the documentation](https://docs.iina.io/pages/creating-plugins.html) for more information.
