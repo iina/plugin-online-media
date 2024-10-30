@@ -5,12 +5,14 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Status</title>
     <style>
         body {
             font-size: 13px;
             font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
             user-select: none;
+            padding: 0;
+            margin: 0;
         }
 
         .download-item {
@@ -32,6 +34,47 @@
             justify-content: space-between;
         }
 
+        .task-options a {
+            margin-left: 8px;
+        }
+
+        .no-task {
+            padding: 10px;
+        }
+
+        h4 {
+            margin: 0;
+            padding: 8px;
+            background: rgba(200, 200, 200, .6);
+        }
+
+        .info-container {
+            padding: 10px 10px 0 10px;
+        }
+
+        #binary-loc,
+        .download-container {
+            padding: 8px 0;
+        }
+
+        #binary-desc {
+            color: rgba(0, 0, 0, .6);
+        }
+
+        #downloading {
+            display: none;
+            text-align: center;
+            padding: 20px 10px 10px 10px;
+        }
+
+        #downloading .message {
+            margin-bottom: 6px;
+        }
+
+        #download-error {
+            color: #ff3b30;
+        }
+
         @media (prefers-color-scheme: dark) {
             body {
                 color: #eee;
@@ -39,11 +82,88 @@
 
             a {
                 color: #007aff;
+                text-decoration: none;
             }
 
             .progress {
                 color: rgba(255, 255, 255, .5);
                 border-bottom: 1px solid rgba(255, 255, 255, .1);
+            }
+
+            h4 {
+                background: rgba(100, 100, 100, .6);
+            }
+
+            #binary-desc {
+                color: rgba(255, 255, 255, .7);
+            }
+        }
+    </style>
+    <style>
+        .spinner {
+            display: inline-block;
+            position: relative;
+            width: 80px;
+            height: 20px;
+        }
+
+        .spinner div {
+            position: absolute;
+            top: 7px;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #fff;
+            animation-timing-function: cubic-bezier(0, 1, 1, 0);
+        }
+
+        .spinner div:nth-child(1) {
+            left: 28px;
+            animation: spinner1 0.6s infinite;
+        }
+
+        .spinner div:nth-child(2) {
+            left: 28px;
+            animation: spinner2 0.6s infinite;
+        }
+
+        .spinner div:nth-child(3) {
+            left: 40px;
+            animation: spinner2 0.6s infinite;
+        }
+
+        .spinner div:nth-child(4) {
+            left: 52px;
+            animation: spinner3 0.6s infinite;
+        }
+
+        @keyframes spinner1 {
+            0% {
+                transform: scale(0);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        @keyframes spinner3 {
+            0% {
+                transform: scale(1);
+            }
+
+            100% {
+                transform: scale(0);
+            }
+        }
+
+        @keyframes spinner2 {
+            0% {
+                transform: translate(0, 0);
+            }
+
+            100% {
+                transform: translate(12px, 0);
             }
         }
     </style>
@@ -51,7 +171,31 @@
 </head>
 
 <body>
-    <div id="content"></div>
+    <section id="status">
+        <h4>Status</h4>
+        <div class="info-container">
+            <div id="binary-desc">Checking for yt-dlp binary...</div>
+            <div id="binary-loc"></div>
+            <button id="download-binary">Download or update yt-dlp</button>
+            <div class="download-container">
+                <div id="downloading">
+                    <div class="message">Downloading yt-dlp...</div>
+                    <div class="spinner">
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                    </div>
+                </div>
+                <div id="download-error"></div>
+                <div id="download-info"></div>
+            </div>
+        </div>
+    </section>
+    <section id="downloads">
+        <h4>Downloads</h4>
+        <div id="content"></div>
+    </section>
 </body>
 
 </html>

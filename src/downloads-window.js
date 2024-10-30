@@ -27,6 +27,25 @@ function init() {
     );
   });
 
+  iina.onMessage("updatingBinary", () => {
+    document.getElementById("download-error").textContent = "";
+    document.getElementById("download-info").textContent = "";
+    document.getElementById("downloading").style.display = "block";
+  });
+
+  iina.onMessage("binaryUpdated", ({ updated, error }) => {
+    document.getElementById("downloading").style.display = "none";
+    if (updated) {
+      document.getElementById("download-info").textContent =
+        "Binary updated successfully.";
+      updateBinaryInfo();
+    } else {
+      document.getElementById(
+        "download-error",
+      ).textContent = `Failed to update binary: ${error}`;
+    }
+  });
+
   window.openFile = function (file) {
     iina.postMessage("openFile", { file: b64_to_utf8(file) });
   };
@@ -34,6 +53,12 @@ function init() {
   window.revealFile = function (file) {
     iina.postMessage("revealFile", { file: b64_to_utf8(file) });
   };
+
+  updateBinaryInfo();
+
+  document.getElementById("download-binary").addEventListener("click", () => {
+    iina.postMessage("updateBinary");
+  });
 }
 
 document.addEventListener("DOMContentLoaded", init);
@@ -44,6 +69,26 @@ function utf8_to_b64(str) {
 
 function b64_to_utf8(str) {
   return decodeURIComponent(escape(window.atob(str)));
+}
+
+function updateBinaryInfo() {
+  iina.postMessage("getBinaryInfo");
+  iina.onMessage("binaryInfo", ({ path }) => {
+    let description,
+      binaryLocation = "";
+    if (path === "youtube-dl") {
+      description = `You are using the yt-dlp binary bundled with IINA.
+        Since IINA's update frequency is lower than yt-dlp, it can be outdated and you may encounter issues.
+        It is recommended to download the latest version using the button below.`;
+    } else if (path === "@data/yt-dlp") {
+      description = `You are using the yt-dlp binary managed by this plugin. You can update it using the button below.`;
+    } else {
+      binaryLocation = path;
+      description = `It seems that you are using a custom yt-dlp binary. You may need to update it manually.`;
+    }
+    document.getElementById("binary-loc").textContent = binaryLocation;
+    document.getElementById("binary-desc").textContent = description;
+  });
 }
 
 const TEMPLATE = `
@@ -66,7 +111,7 @@ Done
 Error: {{error}}
 {{/is_error}}
 </div>
-<div class="right">
+<div class="right task-options">
 {{#is_done}}
 <a href="#" onclick="openFile('{{dest_base64}}')">Open</a>
 <a href="#" onclick="revealFile('{{dest_base64}}')">Reveal in Finder</a>
@@ -76,7 +121,7 @@ Error: {{error}}
 </div>
 {{/data}}
 {{^data}}
-<center>No downloads</center>
+<div class="no-task">No downloads. If you just started a download, it may take a few seconds to show up here.</div>
 {{/data}}
 </div>
 `;

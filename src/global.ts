@@ -1,4 +1,4 @@
-import { downloadYTDLP } from "./binary";
+import { downloadYTDLP, findBinary } from "./binary";
 import {
   downloadVideo,
   resetStatusNeedUpdate,
@@ -12,28 +12,12 @@ let { console, core, global, menu, standaloneWindow, utils } = iina;
 
 menu.addItem(
   menu.item("Update yt-dlp...", async () => {
-    const hasUnfinishedTasks =
-      tasks.findIndex(
-        (t) => t.status === "downloading" || t.status === "pending",
-      ) >= 0;
-    if (hasUnfinishedTasks) {
-      utils.ask("Please wait until all downloads are finished.");
-    }
-
     showDownloadYTDLPWindow();
-    let error = await downloadYTDLP();
-    if (error) {
-      standaloneWindow.setContent(`Error downloading yt-dlp<br>${error}`);
-    } else {
-      standaloneWindow.setContent(`Updated.`);
-      await new Promise((r) => setTimeout(r, 1000));
-      standaloneWindow.close();
-    }
   }),
 );
 
 menu.addItem(
-  menu.item("Show Downloads", async () => {
+  menu.item("Show Status and Downloads...", async () => {
     showDownloadsWindow();
   }),
 );
@@ -82,94 +66,29 @@ function showDownloadsWindow() {
     utils.exec("open", ["-R", file]);
   });
 
+  standaloneWindow.onMessage("getBinaryInfo", () => {
+    const path = findBinary();
+    console.log("Binary path: " + path);
+    standaloneWindow.postMessage("binaryInfo", { path });
+  });
+
+  standaloneWindow.onMessage("updateBinary", () => {
+    updateYTDLP();
+  });
+
   standaloneWindow.open();
 }
 
 // Update yt-dlp window
 
-function showDownloadYTDLPWindow() {
-  standaloneWindow.simpleMode();
-
-  standaloneWindow.setContent(`
-    <div class="message">Downloading yt-dlp...</div>
-    <div class="spinner"><div></div><div></div><div></div><div></div></div>`);
-
-  standaloneWindow.setStyle(`
-  body {
-    user-select: none;
-    pointer-events: none;
-    text-align: center;
-    padding: 20px 10px 10px 10px;
-  }
-  .message {
-    margin-bottom: 6px;
-  }
-  ${spinnerCSS}
-  `);
-
-  standaloneWindow.setProperty({
-    resizable: false,
-    fullSizeContentView: true,
-    hideTitleBar: true,
-  });
-  standaloneWindow.setFrame(400, 112);
-
-  standaloneWindow.open();
+async function updateYTDLP() {
+  standaloneWindow.postMessage("updatingBinary", null);
+  let error = await downloadYTDLP();
+  standaloneWindow.postMessage("binaryUpdated", { updated: !error, error });
 }
 
-let spinnerCSS = `
-.spinner {
-  display: inline-block;
-  position: relative;
-  width: 80px;
-  height: 20px;
+async function showDownloadYTDLPWindow() {
+  showDownloadsWindow();
+  await new Promise((r) => setTimeout(r, 1000));
+  updateYTDLP();
 }
-.spinner div {
-  position: absolute;
-  top: 7px;
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: #fff;
-  animation-timing-function: cubic-bezier(0, 1, 1, 0);
-}
-.spinner div:nth-child(1) {
-  left: 28px;
-  animation: spinner1 0.6s infinite;
-}
-.spinner div:nth-child(2) {
-  left: 28px;
-  animation: spinner2 0.6s infinite;
-}
-.spinner div:nth-child(3) {
-  left: 40px;
-  animation: spinner2 0.6s infinite;
-}
-.spinner div:nth-child(4) {
-  left: 52px;
-  animation: spinner3 0.6s infinite;
-}
-@keyframes spinner1 {
-  0% {
-    transform: scale(0);
-  }
-  100% {
-    transform: scale(1);
-  }
-}
-@keyframes spinner3 {
-  0% {
-    transform: scale(1);
-  }
-  100% {
-    transform: scale(0);
-  }
-}
-@keyframes spinner2 {
-  0% {
-    transform: translate(0, 0);
-  }
-  100% {
-    transform: translate(12px, 0);
-  }
-}`;

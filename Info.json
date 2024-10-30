@@ -1,10 +1,10 @@
 {
-  "name": "Online Media",
-  "identifier": "com.colliderli.ytdl",
-  "version": "0.1.0",
+  "name": "Online Media ",
+  "identifier": "io.iina.ytdl",
+  "version": "1.0.0",
   "ghRepo": "iina/plugin-online-media",
-  "ghVersion": 1,
-  "description": "Official plugin for playing online media via yt-dlp / youtube-dl",
+  "ghVersion": 2,
+  "description": "Official plugin for playing online media via yt-dlp / youtube-dl. The built-in youtube-dl support will be disabled when this plugin is enabled.",
   "author": {
     "name": "IINA Developers",
     "email": "developers@iina.io",
