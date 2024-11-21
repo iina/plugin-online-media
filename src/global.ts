@@ -66,10 +66,20 @@ function showDownloadsWindow() {
     utils.exec("open", ["-R", file]);
   });
 
-  standaloneWindow.onMessage("getBinaryInfo", () => {
+  standaloneWindow.onMessage("getBinaryInfo", async () => {
     const path = findBinary();
     console.log("Binary path: " + path);
-    standaloneWindow.postMessage("binaryInfo", { path });
+    const res = await utils.exec(path, ["--version"])
+    if (res.status === 0) {
+      const version = res.stdout
+      console.log("Version: " + version);
+      standaloneWindow.postMessage("binaryInfo", { path, version, errorMessage: "" });
+    } else {
+      const errorMessage = "Error when executing the binary: " + (res.stderr ? res.stderr : "No error message");
+      console.log(errorMessage);
+      standaloneWindow.postMessage("binaryInfo", { path, version: "", errorMessage });
+    }
+
   });
 
   standaloneWindow.onMessage("updateBinary", () => {

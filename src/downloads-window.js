@@ -73,7 +73,7 @@ function b64_to_utf8(str) {
 
 function updateBinaryInfo() {
   iina.postMessage("getBinaryInfo");
-  iina.onMessage("binaryInfo", ({ path }) => {
+  iina.onMessage("binaryInfo", ({ path, version, errorMessage }) => {
     let description,
       binaryLocation = "";
     if (path === "youtube-dl") {
@@ -86,7 +86,15 @@ function updateBinaryInfo() {
       binaryLocation = path;
       description = `It seems that you are using a custom yt-dlp binary. You may need to update it manually.`;
     }
-    document.getElementById("binary-loc").textContent = binaryLocation;
+    if (errorMessage) {
+      document.getElementById("binary-version").textContent = errorMessage;
+    } else {
+      let message = "Version: " + version;
+      if (binaryLocation) {
+        message += ", binary location: " + binaryLocation
+      }
+      document.getElementById("binary-version").textContent = message;
+    }
     document.getElementById("binary-desc").textContent = description;
   });
 }
