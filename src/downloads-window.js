@@ -72,6 +72,8 @@ function b64_to_utf8(str) {
 }
 
 function updateBinaryInfo() {
+  document.getElementById("binary-desc").textContent =
+    "Checking for yt-dlp binary...";
   iina.postMessage("getBinaryInfo");
   iina.onMessage("binaryInfo", ({ path, version, errorMessage }) => {
     let description,
@@ -85,15 +87,16 @@ function updateBinaryInfo() {
     } else {
       binaryLocation = path;
       description = `It seems that you are using a custom yt-dlp binary. You may need to update it manually.`;
+      document.getElementById("download-binary").style.display = "none";
     }
     if (errorMessage) {
       document.getElementById("binary-version").textContent = errorMessage;
     } else {
       let message = "Version: " + version;
       if (binaryLocation) {
-        message += ", binary location: " + binaryLocation
+        message += `<br>binary location: ${binaryLocation}`;
       }
-      document.getElementById("binary-version").textContent = message;
+      document.getElementById("binary-version").innerHTML = message;
     }
     document.getElementById("binary-desc").textContent = description;
   });

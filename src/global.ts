@@ -11,13 +11,7 @@ let { console, core, global, menu, standaloneWindow, utils } = iina;
 // Menu
 
 menu.addItem(
-  menu.item("Update yt-dlp...", async () => {
-    showDownloadYTDLPWindow();
-  }),
-);
-
-menu.addItem(
-  menu.item("Show Status and Downloads...", async () => {
+  menu.item("Manage yt-dlp and Downloads...", async () => {
     showDownloadsWindow();
   }),
 );
@@ -69,17 +63,26 @@ function showDownloadsWindow() {
   standaloneWindow.onMessage("getBinaryInfo", async () => {
     const path = findBinary();
     console.log("Binary path: " + path);
-    const res = await utils.exec(path, ["--version"])
+    const res = await utils.exec(path, ["--version"]);
     if (res.status === 0) {
-      const version = res.stdout
+      const version = res.stdout;
       console.log("Version: " + version);
-      standaloneWindow.postMessage("binaryInfo", { path, version, errorMessage: "" });
+      standaloneWindow.postMessage("binaryInfo", {
+        path,
+        version,
+        errorMessage: "",
+      });
     } else {
-      const errorMessage = "Error when executing the binary: " + (res.stderr ? res.stderr : "No error message");
+      const errorMessage =
+        "Error when executing the binary: " +
+        (res.stderr ? res.stderr : "No error message");
       console.log(errorMessage);
-      standaloneWindow.postMessage("binaryInfo", { path, version: "", errorMessage });
+      standaloneWindow.postMessage("binaryInfo", {
+        path,
+        version: "",
+        errorMessage,
+      });
     }
-
   });
 
   standaloneWindow.onMessage("updateBinary", () => {
