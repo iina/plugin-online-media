@@ -31,7 +31,7 @@ function extractChapters(data: string, videoLength: number) {
   const lines = data.split(/\r|\n/);
   const result: Chapter[] = [];
   for (const line of lines) {
-    if (!line) return;
+    if (!line) continue;
     const time = matchTime(line);
     if (time && time < videoLength) {
       result.push({ time: time, title: line });
