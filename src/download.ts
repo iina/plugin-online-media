@@ -36,7 +36,7 @@ class DownloadTask {
   private get args() {
     const args: string[] = [];
     args.push("-P", this.destFolder);
-    args.push("--format", this.format);
+    // args.push("--format", this.format);
     args.push(
       "--progress-template",
       "!!%(progress.downloaded_bytes)s-%(progress.total_bytes)s-%(progress.eta)s",
@@ -98,13 +98,15 @@ class DownloadTask {
 }
 
 export async function downloadVideo(url: string, player: string) {
-  const hasFFmpeg = (await utils.exec("which", ["ffmpeg"])).status === 0;
-  const format = hasFFmpeg ? "bestvideo+bestaudio/best" : "best";
-  console.log(`FFmpeg found: ${hasFFmpeg}; using format: ${format}`);
+  // const hasFFmpeg =
+  //   (await utils.exec("/bin/bash", ["-c", "'which ffmpeg'"])).status === 0;
+  // const format = hasFFmpeg ? "bestvideo+bestaudio/best" : "best";
+  // console.log(`FFmpeg found: ${hasFFmpeg}; using format: ${format}`);
+  const format = null;
 
   const ytdl = findBinary();
   const filename = (
-    await utils.exec(ytdl, ["--format", format, "--get-filename", url])
+    await utils.exec(ytdl, ["--get-filename", url])
   ).stdout.replaceAll("\n", "");
   console.log(filename);
 
