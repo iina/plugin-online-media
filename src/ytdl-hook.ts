@@ -55,13 +55,22 @@ export async function runYTDLHook(url: string) {
   args.push("--format", format);
 
   const rawOptions = opt.rawOptions;
-  rawOptions.split(" ").forEach((arg, index) => {
+  rawOptions.split(" ").forEach((rawArg, index) => {
+    let arg = rawArg;
+    if (rawArg.includes("—")) {
+      arg = rawArg.replace("—", "--");
+      console.warn(`Argument ${rawArg} contains "—", trying to autocorrect`);
+    }
     if (arg.startsWith("--")) {
       const argName = arg.substring(2);
       const argValue = rawOptions[index + 1];
-      if (argName === "sub-lang" && argValue) allsubs = true;
-      else if (argName === "proxy" && argValue) option.proxy = argValue;
-      else if (argName === "yes-playlist") option.usePlaylist = true;
+      if (["sub-lang", "sub-langs", "srt-lang"].includes(argName) && argValue) {
+        allsubs = false;
+      } else if (argName === "proxy" && argValue) {
+        option.proxy = argValue;
+      } else if (argName === "yes-playlist") {
+        option.usePlaylist = true;
+      }
     }
     if (arg) args.push(arg);
   });

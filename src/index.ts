@@ -37,6 +37,8 @@ mpv.addHook(
 mpv.addHook("on_preloaded", 10, () => {
   console.log("ytdl preload hook");
   if (chapterList.length > 0) {
+    console.log("Setting chapter list");
+    console.log(chapterList);
     mpv.set("chapter-list", chapterList);
     chapterList.length = 0;
   }
