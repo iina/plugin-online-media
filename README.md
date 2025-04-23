@@ -15,4 +15,18 @@ npm i
 npm run build
 ```
 
+You may use the bundled `iina-plugin` binary to load or package the plugin.
+
+This will create a symbolic link to the plugin in IINA's plugin directory and IINA will load the plugin in development mode:
+
+```sh
+iina-plugin link .
+```
+
+An `iinaplgz` file will be created in the current directory after running the `pack` command:
+
+```sh
+iina-plugin pack .
+```
+
 Please check out the [guide in the documentation](https://docs.iina.io/pages/creating-plugins.html) for more information.
