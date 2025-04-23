@@ -53,7 +53,7 @@ declare namespace YTDL {
 
     requested_subtitles?: Record<
       string,
-      { url: string; ext: string; data: string; _auto: boolean }
+      { url: string; ext: string; name?: string; data?: string; _auto: boolean }
     >;
     formats?: Video[];
     requested_formats?: Video[];

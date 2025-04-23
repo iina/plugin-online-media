@@ -4,6 +4,8 @@ import {
   optionWasSet,
   edlTrackJoined,
   optionWasSetLocally,
+  edlEscape,
+  ytdlCodecToMpvCodec,
 } from "./utils";
 import { opt } from "./options";
 import { currentURL } from "./ytdl-hook";
@@ -136,6 +138,7 @@ function processVideo(reqfmts: YTDL.Video[], json?: YTDL.Entity) {
   if (json.requested_subtitles) {
     Object.keys(json.requested_subtitles).forEach((lang) => {
       const subInfo = json.requested_subtitles[lang];
+      console.log(subInfo);
 
       console.log(`adding subtitle [${lang}]`);
       const sub = subInfo.data
@@ -145,7 +148,13 @@ function processVideo(reqfmts: YTDL.Video[], json?: YTDL.Entity) {
         : null;
 
       if (sub) {
-        mpv.command("sub-add", [sub, "auto", subInfo.ext, lang]);
+        const codec = ytdlCodecToMpvCodec(subInfo.ext);
+        const codecStr = codec ? `,codec=${codec};` : ";";
+        const edl = `edl://!no_clip;!delay_open,media_type=sub${codecStr}${edlEscape(
+          sub,
+        )}`;
+        const title = subInfo.name || subInfo.ext;
+        mpv.command("sub-add", [edl, "auto", title, lang]);
       } else {
         console.log(`No subtitle data/url for ${lang}`);
       }

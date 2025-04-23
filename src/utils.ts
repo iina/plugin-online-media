@@ -14,6 +14,15 @@ const safeProtos = new Set([
   "data",
 ]);
 
+export function ytdlCodecToMpvCodec(codec: string) {
+  if (codec === "vtt") return "webvtt";
+  if (codec === "opus" || codec === "vp9") return codec;
+  if (codec.startsWith("avc")) return "h264";
+  if (codec.startsWith("av0")) return "av1";
+  if (codec.startsWith("mp4")) return "aac";
+  return null;
+}
+
 export function optionWasSet(name: string) {
   return mpv.getFlag(`"option-info/${name}/set-from-commandline"`);
 }
