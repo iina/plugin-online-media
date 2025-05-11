@@ -4,10 +4,15 @@
     "sourceMap": false,
     "target": "esnext",
     "module": "es6",
+    "types": [],
     "typeRoots": [
       "./node_modules/@types",
       "./node_modules/iina-plugin-definition"
     ]
   },
+  "include": [
+    "src/**/*",
+    "./node_modules/iina-plugin-definition/iina/**/*.d.ts"
+  ],
   "compileOnSave": false
 }

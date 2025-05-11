@@ -15,24 +15,16 @@ if (!opt.try_ytdl_first) {
   });
 }
 
-mpv.addHook(
-  opt.try_ytdl_first ? "on_load" : "on_load_fail",
-  10,
-  async (next) => {
-    console.log("ytdl full hook");
-    const url = mpv.getString("stream-open-filename");
-    if (
-      url.startsWith("ytdl://") ||
-      url.startsWith("http://") ||
-      url.startsWith("https://")
-    ) {
-      if (!isBlacklisted(url)) {
-        await runYTDLHook(url);
-      }
+mpv.addHook(opt.try_ytdl_first ? "on_load" : "on_load_fail", 10, async (next) => {
+  console.log("ytdl full hook");
+  const url = mpv.getString("stream-open-filename");
+  if (url.startsWith("ytdl://") || url.startsWith("http://") || url.startsWith("https://")) {
+    if (!isBlacklisted(url)) {
+      await runYTDLHook(url);
     }
-    next();
-  },
-);
+  }
+  next();
+});
 
 mpv.addHook("on_preloaded", 10, () => {
   console.log("ytdl preload hook");

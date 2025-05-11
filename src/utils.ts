@@ -81,11 +81,7 @@ export function getIndexFromYouTubePlaylist(url: string, json: YTDL.Playlist) {
 
   const maybeIdx = parseInt(args.index);
 
-  if (
-    maybeIdx &&
-    json.entries.length >= maybeIdx &&
-    json.entries[maybeIdx].id === args.v
-  ) {
+  if (maybeIdx && json.entries.length >= maybeIdx && json.entries[maybeIdx].id === args.v) {
     console.log("index matches requested video");
     return maybeIdx;
   }
@@ -102,9 +98,7 @@ function joinURL(baseURL: string, fragment: YTDL.URLLike) {
     // make absolute url
     const url = fragment.path;
     if (url.startsWith("http://") || url.startsWith("https://")) return url;
-    const [, proto, domain, rest] = baseURL.match(
-      /(https?:\/\/)([^\/]+\/)(.*)\/?/,
-    );
+    const [, proto, domain, rest] = baseURL.match(/(https?:\/\/)([^\/]+\/)(.*)\/?/);
     const segs = rest.split("/").concat(url.split("/"));
     const resolved: string[] = [];
     for (const seg of segs) {
@@ -139,9 +133,7 @@ export function edlTrackJoined(
 
     for (let i = 1; i < fragments.length; i++) {
       if (!fragments[i].duration) {
-        console.error(
-          "EDL doesn't support fragments without duration with MP4 DASH",
-        );
+        console.error("EDL doesn't support fragments without duration with MP4 DASH");
         return null;
       }
     }
@@ -149,11 +141,7 @@ export function edlTrackJoined(
 
   for (const frag of fragments) {
     if (!isSafeURL(joinURL(base, frag))) return null;
-    parts.push(
-      edlEscape(joinURL(base, frag)) + frag.duration
-        ? `,length=${frag.duration}`
-        : "",
-    );
+    parts.push(edlEscape(joinURL(base, frag)) + frag.duration ? `,length=${frag.duration}` : "");
   }
 
   return `edl://${parts.join(";")};`;
@@ -175,10 +163,7 @@ export function formatFileSize(bytes: number, si = false, dp = 1) {
   do {
     bytes /= thresh;
     ++u;
-  } while (
-    Math.round(Math.abs(bytes) * r) / r >= thresh &&
-    u < units.length - 1
-  );
+  } while (Math.round(Math.abs(bytes) * r) / r >= thresh && u < units.length - 1);
 
   return bytes.toFixed(dp) + " " + units[u];
 }

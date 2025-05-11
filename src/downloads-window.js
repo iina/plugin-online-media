@@ -21,10 +21,7 @@ function init() {
       item[`is_${item.status}`] = true;
       item.dest_base64 = utf8_to_b64(item.dest);
     });
-    document.getElementById("content").innerHTML = mustache.render(
-      TEMPLATE,
-      message,
-    );
+    document.getElementById("content").innerHTML = mustache.render(TEMPLATE, message);
   });
 
   iina.onMessage("updatingBinary", () => {
@@ -36,13 +33,10 @@ function init() {
   iina.onMessage("binaryUpdated", ({ updated, error }) => {
     document.getElementById("downloading").style.display = "none";
     if (updated) {
-      document.getElementById("download-info").textContent =
-        "Binary updated successfully.";
+      document.getElementById("download-info").textContent = "Binary updated successfully.";
       updateBinaryInfo();
     } else {
-      document.getElementById(
-        "download-error",
-      ).textContent = `Failed to update binary: ${error}`;
+      document.getElementById("download-error").textContent = `Failed to update binary: ${error}`;
     }
   });
 
@@ -51,10 +45,12 @@ function init() {
   };
 
   window.revealFile = function (file) {
-    iina.postMessage("revealFile", { file: b64_to_utf8(file) });
+    iina.postMessage("revealFile", { fileName: b64_to_utf8(file) });
   };
 
-  updateBinaryInfo();
+  document.getElementById("check-binary").addEventListener("click", () => {
+    updateBinaryInfo();
+  });
 
   document.getElementById("download-binary").addEventListener("click", () => {
     iina.postMessage("updateBinary");
@@ -72,8 +68,7 @@ function b64_to_utf8(str) {
 }
 
 function updateBinaryInfo() {
-  document.getElementById("binary-desc").textContent =
-    "Checking for yt-dlp binary...";
+  document.getElementById("binary-desc").textContent = "Checking for yt-dlp binary...";
   iina.postMessage("getBinaryInfo");
   iina.onMessage("binaryInfo", ({ path, version, errorMessage }) => {
     let description,
@@ -82,7 +77,7 @@ function updateBinaryInfo() {
       description = `You are using the yt-dlp binary bundled with IINA.
         Since IINA's update frequency is lower than yt-dlp, it can be outdated and you may encounter issues.
         It is recommended to download the latest version using the button below.`;
-    } else if (path === "@data/yt-dlp") {
+    } else if (path === "@data/yt-dlp/yt-dlp_macos") {
       description = `You are using the yt-dlp binary managed by this plugin. You can update it using the button below.`;
     } else {
       binaryLocation = path;

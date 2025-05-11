@@ -1,12 +1,7 @@
 import { downloadYTDLP, findBinary } from "./binary";
-import {
-  downloadVideo,
-  resetStatusNeedUpdate,
-  statusNeedUpdate,
-  tasks,
-} from "./download";
+import { downloadVideo, resetStatusNeedUpdate, statusNeedUpdate, tasks } from "./download";
 
-let { console, core, global, menu, standaloneWindow, utils } = iina;
+let { console, global, menu, standaloneWindow, file, utils } = iina;
 
 // Menu
 
@@ -27,9 +22,7 @@ global.onMessage("downloadVideo", async (url, player) => {
 });
 
 export function updateDownloadsWindow() {
-  const active = !tasks.every(
-    (t) => t.status === "done" || t.status === "error",
-  );
+  const active = !tasks.every((t) => t.status === "done" || t.status === "error");
   standaloneWindow.postMessage("update", {
     active,
     data: tasks.map((t) => t.serialize()),
@@ -56,8 +49,8 @@ function showDownloadsWindow() {
     global.createPlayerInstance({ url: file });
   });
 
-  standaloneWindow.onMessage("revealFile", ({ file }) => {
-    utils.exec("open", ["-R", file]);
+  standaloneWindow.onMessage("revealFile", ({ fileName }) => {
+    file.showInFinder(fileName);
   });
 
   standaloneWindow.onMessage("getBinaryInfo", async () => {
@@ -74,8 +67,7 @@ function showDownloadsWindow() {
       });
     } else {
       const errorMessage =
-        "Error when executing the binary: " +
-        (res.stderr ? res.stderr : "No error message");
+        "Error when executing the binary: " + (res.stderr ? res.stderr : "No error message");
       console.log(errorMessage);
       standaloneWindow.postMessage("binaryInfo", {
         path,

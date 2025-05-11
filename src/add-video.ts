@@ -44,14 +44,10 @@ function extractChapters(data: string, videoLength: number) {
 }
 
 function isValidManifest(json: YTDL.Entity) {
-  const reqfmt = json.requested_formats
-    ? json.requested_formats[1]
-    : ({} as YTDL.Entity);
+  const reqfmt = json.requested_formats ? json.requested_formats[1] : ({} as YTDL.Entity);
   if (!reqfmt.manifest_url && !json.manifest_url) return false;
   const proto = reqfmt.protocol || json.protocol || "";
-  return proto === "http_dash_segments"
-    ? hasNativeDashDemuxer()
-    : proto.startsWith("m3u8");
+  return proto === "http_dash_segments" ? hasNativeDashDemuxer() : proto.startsWith("m3u8");
 }
 
 function hasNativeDashDemuxer() {
@@ -96,11 +92,7 @@ function processVideo(reqfmts: YTDL.Video[], json?: YTDL.Entity) {
         streamURL = edlTrack || track.url;
       } else if (track.vcodec == "none") {
         // according to ytdl, if vcodec is None, it's audio
-        mpv.command("audio-add", [
-          edlTrack || track.url,
-          "auto",
-          track.format_note || "",
-        ]);
+        mpv.command("audio-add", [edlTrack || track.url, "auto", track.format_note || ""]);
       }
     }
   } else if (json.url) {
@@ -126,11 +118,7 @@ function processVideo(reqfmts: YTDL.Video[], json?: YTDL.Entity) {
   mpv.set("file-local-options/force-media-title", json.title);
 
   // set hls-bitrate for dash track selection
-  if (
-    maxBitrate > 0 &&
-    !optionWasSet("hls-bitrate") &&
-    !optionWasSetLocally("hls-bitrate")
-  ) {
+  if (maxBitrate > 0 && !optionWasSet("hls-bitrate") && !optionWasSetLocally("hls-bitrate")) {
     mpv.set("file-local-options/hls-bitrate", maxBitrate * 1000);
   }
 
@@ -150,9 +138,7 @@ function processVideo(reqfmts: YTDL.Video[], json?: YTDL.Entity) {
       if (sub) {
         const codec = ytdlCodecToMpvCodec(subInfo.ext);
         const codecStr = codec ? `,codec=${codec};` : ";";
-        const edl = `edl://!no_clip;!delay_open,media_type=sub${codecStr}${edlEscape(
-          sub,
-        )}`;
+        const edl = `edl://!no_clip;!delay_open,media_type=sub${codecStr}${edlEscape(sub)}`;
         const title = subInfo.name || subInfo.ext;
         mpv.command("sub-add", [edl, "auto", title, lang]);
       } else {
@@ -174,11 +160,7 @@ function processVideo(reqfmts: YTDL.Video[], json?: YTDL.Entity) {
   }
 
   // set start time
-  if (
-    json.start_time &&
-    !optionWasSet("start") &&
-    !optionWasSetLocally("start")
-  ) {
+  if (json.start_time && !optionWasSet("start") && !optionWasSetLocally("start")) {
     console.log(`Setting start to: ${json.start_time} secs`);
     mpv.set("file-local-options/start", json.start_time);
   }
@@ -188,9 +170,7 @@ function processVideo(reqfmts: YTDL.Video[], json?: YTDL.Entity) {
     mpv.set("file-local-options/video-aspect", json.stretched_ratio);
   }
 
-  let streamOpts =
-    mpv.getNative<Record<string, string>>("file-local-options/stream-lavf-o") ||
-    {};
+  let streamOpts = mpv.getNative<Record<string, string>>("file-local-options/stream-lavf-o") || {};
 
   // for rtmp
   if (json.protocol == "rtmp") {
@@ -227,12 +207,8 @@ export function addVideo(json: YTDL.Entity) {
         isSwitchingFormat = false;
       }
     } else {
-      currentVideoFormat = json.requested_formats.find(
-        (f) => f.vcodec !== "none",
-      ).format_id;
-      currentAudioFormat = json.requested_formats.find(
-        (f) => f.vcodec === "none",
-      ).format_id;
+      currentVideoFormat = json.requested_formats.find((f) => f.vcodec !== "none").format_id;
+      currentAudioFormat = json.requested_formats.find((f) => f.vcodec === "none").format_id;
     }
 
     // add to menu

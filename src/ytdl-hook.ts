@@ -10,7 +10,7 @@ import { addVideo, isSwitchingFormat } from "./add-video";
 import { opt } from "./options";
 import { findBinary } from "./binary";
 
-const { core, console, event, mpv, menu, utils } = iina;
+const { core, console, mpv, utils } = iina;
 
 export let currentURL: string;
 
@@ -152,9 +152,7 @@ function ytdlSuccess(url: string, json: YTDL.Entity, option: TempOption) {
         }
 
         // there might not be subs for the first segment
-        const entryWithSubs = json.entries.find(
-          (entry) => entry.requested_subtitles,
-        );
+        const entryWithSubs = json.entries.find((entry) => entry.requested_subtitles);
         if (entryWithSubs && entryWithSubs.duration) {
           const subs = entryWithSubs.requested_subtitles;
           Object.keys(subs).forEach((lang) => {
@@ -193,19 +191,14 @@ function ytdlSuccess(url: string, json: YTDL.Entity, option: TempOption) {
         }
 
         if (site.indexOf("://") < 0) {
-          const prefix =
-            site.indexOf(":") >= 0 ? "ytdl://" : "https://youtu.be/";
+          const prefix = site.indexOf(":") >= 0 ? "ytdl://" : "https://youtu.be/";
           playlist.push(`${prefix}${site}`);
         } else if (isSafeURL(site)) {
           playlist.push(site);
         }
       }
 
-      if (
-        option.usePlaylist &&
-        optionWasSet("playlist-start") &&
-        playlistIndex
-      ) {
+      if (option.usePlaylist && optionWasSet("playlist-start") && playlistIndex) {
         mpv.set("playlist-start", playlistIndex);
       }
 

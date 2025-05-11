@@ -105,22 +105,13 @@ export async function downloadVideo(url: string, player: string) {
   const format = null;
 
   const ytdl = findBinary();
-  const filename = (
-    await utils.exec(ytdl, ["--get-filename", url])
-  ).stdout.replaceAll("\n", "");
+  const filename = (await utils.exec(ytdl, ["--get-filename", url])).stdout.replaceAll("\n", "");
   console.log(filename);
 
   let destFolder = `~/Downloads`;
   const args: string[] = [];
 
-  const task = new DownloadTask(
-    player,
-    url,
-    filename,
-    destFolder,
-    ytdl,
-    format,
-  );
+  const task = new DownloadTask(player, url, filename, destFolder, ytdl, format);
   tasks.push(task);
   task.start();
 }
