@@ -9,24 +9,43 @@ export async function downloadYTDLP() {
   const downloadedZip = utils.resolvePath(`@data/yt-dlp_${tempID}.zip`);
   const unzipFolder = utils.resolvePath(`@data/yt-dlp_${tempID}`);
   const destFolder = utils.resolvePath(`@data/yt-dlp`);
+  let errorMessage = null;
   try {
     console.log(`Downloading yt-dlp to ${downloadedZip}`);
     await http.download(YTDLP_URL, downloadedZip);
-    await utils.exec("/bin/bash", [
+    const res = await utils.exec("/bin/bash", [
       "-c",
       `
-      unzip '${downloadedZip}' -d '${unzipFolder}' &&
-      mv '${unzipFolder}' '${destFolder}' &&
-      rm '${downloadedZip}' &&
-      xattr -cr '${destFolder}'
+      TARGET="${destFolder}";
+      rm -rf "${destFolder}_*";
+      if [ -e "$TARGET" ] && [ ! -d "$TARGET" ] && [ -f "$TARGET" ]; then
+        rm -rf "$TARGET";
+      fi;
+      if [ ! -e "$TARGET" ]; then
+        mkdir -p "$TARGET";
+      fi;
+      unzip "${downloadedZip}" -d "${unzipFolder}" &&
+      rm -rf "$TARGET"/* &&
+      mv "${unzipFolder}"/* "$TARGET"/ &&
+      rm "${downloadedZip}" &&
+      xattr -cr "$TARGET"
       `,
     ]);
-    return null;
+    if (res.status !== 0) {
+      throw new Error(`Failed to unzip yt-dlp: ${res.stderr}`);
+    }
   } catch (e) {
-    console.error(e);
-    file.delete(downloadedZip);
-    return e.toString();
+    console.error(e.toString());
+    errorMessage = e.toString();
+  } finally {
+    try {
+      if (file.exists(downloadedZip)) file.delete(downloadedZip);
+      if (file.exists(unzipFolder)) file.delete(unzipFolder);
+    } catch (e1) {
+      console.error("Failed to delete temp files: " + e1.toString());
+    }
   }
+  return errorMessage;
 }
 
 export function findBinary(): string {

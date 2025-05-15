@@ -33,7 +33,8 @@ function init() {
   iina.onMessage("binaryUpdated", ({ updated, error }) => {
     document.getElementById("downloading").style.display = "none";
     if (updated) {
-      document.getElementById("download-info").textContent = "Binary updated successfully.";
+      document.getElementById("download-info").textContent =
+        "Binary updated successfully. Please allow a few seconds preparing and verifying the new binary.";
       updateBinaryInfo();
     } else {
       document.getElementById("download-error").textContent = `Failed to update binary: ${error}`;
