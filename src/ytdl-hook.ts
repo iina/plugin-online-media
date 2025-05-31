@@ -55,6 +55,9 @@ export async function runYTDLHook(url: string) {
   args.push("--format", format);
 
   const rawOptions = opt.rawOptions;
+  const includeSubs = opt.includeSubs;
+  const includeAutoSubs = includeSubs && opt.includeAutoSubs;
+
   rawOptions.split(" ").forEach((rawArg, index) => {
     let arg = rawArg;
     if (rawArg.includes("—")) {
@@ -62,8 +65,17 @@ export async function runYTDLHook(url: string) {
       console.warn(`Argument ${rawArg} contains "—", trying to autocorrect`);
     }
     if (arg.startsWith("--")) {
-      const argName = arg.substring(2);
-      const argValue = rawOptions[index + 1];
+      let argName: string;
+      let argValue: string;
+      // handle both --arg=value and --arg value cases
+      if (arg.includes("=")) {
+        const splitted = arg.split("=");
+        argName = splitted[0];
+        argValue = splitted[1];
+      } else {
+        argName = arg.substring(2);
+        argValue = rawOptions[index + 1];
+      }
       if (["sub-lang", "sub-langs", "srt-lang"].includes(argName) && argValue) {
         allsubs = false;
       } else if (argName === "proxy" && argValue) {
@@ -75,8 +87,11 @@ export async function runYTDLHook(url: string) {
     if (arg) args.push(arg);
   });
 
-  if (allsubs) {
-    args.push("--all-subs");
+  if (allsubs && includeSubs) {
+    args.push("--sub-langs", "all");
+  }
+  if (includeAutoSubs) {
+    args.push("--write-auto-subs");
   }
   if (!option.usePlaylist) {
     args.push("--no-playlist");

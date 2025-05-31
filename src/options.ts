@@ -28,6 +28,12 @@ export const opt = {
         return "bestvideo+bestaudio/best";
     }
   },
+  get includeSubs(): boolean {
+    return preferences.get("include_subs");
+  },
+  get includeAutoSubs(): boolean {
+    return preferences.get("include_auto_subs");
+  },
 };
 
 let urlBlackList: RegExp[];

@@ -21,6 +21,8 @@
     "try_ytdl_first": false,
     "use_manifests": false,
     "raw_options": "",
+    "include_subs": true,
+    "include_auto_subs": false,
     "video_quality": "best",
     "max_video_height": 1080,
     "custom_ytdl_format": "",
