@@ -198,7 +198,8 @@ function formatDescription(f: YTDL._BaseEntity): string {
 export function addVideo(json: YTDL.Entity) {
   let reqfmts = json.requested_formats;
 
-  if (json.formats) {
+  if (json.formats && json.requested_formats) {
+    // live streams can have no requested_formats
     if (isSwitchingFormat) {
       const af = json.formats.find((f) => f.format_id === currentAudioFormat);
       const vf = json.formats.find((f) => f.format_id === currentVideoFormat);

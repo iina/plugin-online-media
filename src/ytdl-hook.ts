@@ -119,9 +119,9 @@ export async function runYTDLHook(url: string) {
       let json = JSON.parse(out.stdout);
       console.log("Youtube-dl succeeded.");
       ytdlSuccess(url, json, option);
-    } catch {
+    } catch (err) {
       core.osd("Failed to fetch online media information");
-      console.error(`Failed to parse youtube-dl's output`);
+      console.error(`Failed to parse youtube-dl's output: ${err}`);
     }
   } catch (err) {
     core.osd("Unknown error.");
