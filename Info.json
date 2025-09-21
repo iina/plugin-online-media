@@ -1,9 +1,9 @@
 {
   "name": "Online Media",
   "identifier": "io.iina.ytdl",
-  "version": "0.9.7",
+  "version": "0.9.8",
   "ghRepo": "iina/plugin-online-media",
-  "ghVersion": 9,
+  "ghVersion": 10,
   "description": "Official plugin for playing online media via yt-dlp / youtube-dl. The built-in youtube-dl support will be disabled when this plugin is enabled.",
   "author": {
     "name": "IINA Developers",
