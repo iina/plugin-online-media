@@ -47,15 +47,17 @@
 
 <body>
   <div class="pref-section">
-    Use custom youtube-dl/yt-dlp:
-    <p class="small secondary pref-help">
-      Enter the path to the youtube-dl or yt-dlp binary.
-      If you are using Homebrew, the path is usually <code>/opt/homebrew/bin/yt-dlp</code> for Apple Sillion Macs and
-      <code>/usr/local/bin/yt-dlp</code> for Intel Macs.
-    </p>
-    <div style="margin-top: 2px">
+    <label>
+      Use custom yt-dlp installation:
       <input type="text" data-pref-key="ytdl_path" style="width: 100%; margin-top: 2px" />
-    </div>
+    </label>
+    <p class="small secondary pref-help">
+      Enter the path to the executable. Hint:
+      <br>- You can put just <code>yt-dlp</code> if yt-dlp is already in the $PATH
+      <br>- Uv/pipx-installed yt-dlp is typically located at <code>~/.local/bin/yt-dlp</code>
+      <br>- Homebrew-installed yt-dlp is typically located at <code>/opt/homebrew/bin/yt-dlp</code> for Apple Silicon and
+      <code>/usr/local/bin/yt-dlp</code> for macOS Intel
+    </p>
   </div>
   <div class="pref-section">
     Default video and audio quality:
@@ -67,12 +69,12 @@
       <div>
         <label><input type="radio" name="video_quality" value="use_max" data-pref-key />
           Video not larger than:</label>
-        <input type="number" data-pref-key="max_video_height" style="width: 4em" />
+        <input type="number" data-pref-key="max_video_height" style="width: 4.5em" />
         p
       </div>
       <div>
         <label><input type="radio" name="video_quality" value="custom" data-pref-key />
-          Custom youtube-dl format:</label>
+          Custom yt-dlp format:</label>
         <input type="text" data-pref-key="custom_ytdl_format" />
       </div>
     </div>
@@ -99,11 +101,11 @@
   <div class="pref-section">
     <label>
       <input type="checkbox" data-type="bool" data-pref-key="try_ytdl_first" />
-      Try youtube-dl first
+      Try yt-dlp first
     </label>
     <p class="small secondary pref-help">
-      Try parsing the URL with youtube-dl first, instead of the default where
-      it's only after mpv failed to open it.
+      Try parsing the URL with yt-dpl first, if it fails, then with IINA's engine - mpv.
+      Instead of the default, where mpv is tried first.
     </p>
   </div>
   <div class="pref-section">
@@ -123,8 +125,8 @@
         spellcheck="false" style="width: 100%; margin-top: 2px" />
     </label>
     <p class="small secondary pref-help">
-      Additional raw options to pass to youtube-dl/yt-dlp, for example:<br>
-      <code>--write-auto-sub --sub-langs en</code>
+      Additional raw options to pass to yt-dlp.
+      <br>For example: <code>--write-auto-sub --sub-langs en</code>
     </p>
   </div>
 </body>

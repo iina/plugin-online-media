@@ -100,7 +100,7 @@ export async function runYTDLHook(url: string) {
   args.push("--", url);
 
   try {
-    console.log("Running youtube-dl...");
+    console.log("Running ytdl...");
 
     // find the binary
     const ytdl = findBinary();
@@ -108,20 +108,20 @@ export async function runYTDLHook(url: string) {
     // execute
     const out = await utils.exec(ytdl, args);
     if (out.status !== 0) {
-      core.osd("Failed to run youtube-dl");
-      console.error(`Error running youtube-dl: ${out.stderr}`);
+      core.osd("Failed to run ytdl");
+      console.error(`Error running ytdl: ${out.stderr}`);
       return;
     }
-    console.log("Finished running youtube-dl");
+    console.log("Finished running ytdl");
 
     // parse the result
     try {
       let json = JSON.parse(out.stdout);
-      console.log("Youtube-dl succeeded.");
+      console.log("ytdl succeeded.");
       ytdlSuccess(url, json, option);
     } catch (err) {
       core.osd("Failed to fetch online media information");
-      console.error(`Failed to parse youtube-dl's output: ${err}`);
+      console.error(`Failed to parse ytdl's output: ${err}`);
     }
   } catch (err) {
     core.osd("Unknown error.");

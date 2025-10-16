@@ -11,27 +11,30 @@ function init() {
     }, 1000));
   const stopUpdate = () => clearInterval(interval);
 
-  iina.onMessage("update", function (message) {
-    if (message.active) {
+  iina.onMessage("update", (msg) => {
+    if (msg.active) {
       startUpdate();
     } else {
       stopUpdate();
     }
-    message.data.forEach((item) => {
+    msg.data.forEach((item) => {
       item[`is_${item.status}`] = true;
       item.dest_base64 = utf8_to_b64(item.dest);
     });
-    document.getElementById("content").innerHTML = mustache.render(TEMPLATE, message);
+    document.getElementById("content").innerHTML = mustache.render(TEMPLATE, msg);
   });
 
   iina.onMessage("updatingBinary", () => {
+    document.getElementById("binary-desc").textContent = "";
+    document.getElementById("binary-version").textContent = "";
     document.getElementById("download-info").textContent = "";
     document.getElementById("downloading").style.display = "block";
   });
 
   iina.onMessage("binaryUpdated", ({ res }) => {
     document.getElementById("downloading").style.display = "none";
-    document.getElementById("download-info").innerHTML = res.status === 0 ? res.stdout : res.stderr;
+    document.getElementById("download-info").textContent =
+      res.status === 0 ? res.stdout : res.stderr;
     document.getElementById("download-info").style.color = res.status === 0 ? "" : "#ff3b30";
   });
 
@@ -63,36 +66,30 @@ function b64_to_utf8(str) {
 }
 
 function updateBinaryInfo() {
-  document.getElementById("binary-desc").textContent = "Checking for yt-dlp binary...";
+  document.getElementById("download-info").textContent = "";
+  document.getElementById("binary-desc").textContent = "Checking for yt-dlp...";
   iina.postMessage("getBinaryInfo");
   iina.onMessage("binaryInfo", ({ path, version, errorMessage }) => {
-    let description,
-      binaryLocation = "";
+    let desc = "";
     if (path === null) {
-      description = `Unable to find yt-dlp.
+      desc = `Unable to find yt-dlp.
         Troubleshooting:
         - Reinstall IINA (IINA-bundled yt-dlp is missing)
         - If you have an existing installation of yt-dlp,
-        either put it on $PATH or set its path in 'Plugins>Online Media>Settings>Use custom youtube-dl/yt-dlp'`;
+        either put it in $PATH or set its path in 'Plugins>Online Media>Settings>Use custom yt-dlp installation'`;
     } else if (path === "iina-ytdl") {
-      description = `You are using yt-dlp bundled with IINA.
+      desc = `You are using yt-dlp bundled with IINA.
         It is recommended to keep it up to date using the button below.`;
     } else {
       binaryLocation = path;
-      description = `You are using yt-dlp configured by by you in plugin settings.
+      desc = `You are using yt-dlp configured by you in plugin settings.
         You may need to update it manually.`;
       document.getElementById("download-binary").style.display = "none";
     }
-    if (errorMessage) {
-      document.getElementById("binary-version").textContent = errorMessage;
-    } else {
-      let message = "Version: " + version;
-      if (binaryLocation) {
-        message += `<br>binary location: ${binaryLocation}`;
-      }
-      document.getElementById("binary-version").innerHTML = message;
-    }
-    document.getElementById("binary-desc").textContent = description;
+    document.getElementById("binary-desc").textContent = desc;
+
+    const info = `Version: ${version}` + (path && path !== "iina-ytdl" ? `<br>Path: ${path}` : "");
+    document.getElementById("binary-version").innerHTML = errorMessage ? errorMessage : info;
   });
 }
 
