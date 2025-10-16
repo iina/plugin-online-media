@@ -25,20 +25,14 @@ function init() {
   });
 
   iina.onMessage("updatingBinary", () => {
-    document.getElementById("download-error").textContent = "";
     document.getElementById("download-info").textContent = "";
     document.getElementById("downloading").style.display = "block";
   });
 
-  iina.onMessage("binaryUpdated", ({ updated, error }) => {
+  iina.onMessage("binaryUpdated", ({ res }) => {
     document.getElementById("downloading").style.display = "none";
-    if (updated) {
-      document.getElementById("download-info").textContent =
-        "Binary updated successfully. Please allow a few seconds preparing and verifying the new binary.";
-      updateBinaryInfo();
-    } else {
-      document.getElementById("download-error").textContent = `Failed to update binary: ${error}`;
-    }
+    document.getElementById("download-info").innerHTML = res.status === 0 ? res.stdout : res.stderr;
+    document.getElementById("download-info").style.color = res.status === 0 ? "" : "#ff3b30";
   });
 
   window.openFile = function (file) {
@@ -74,15 +68,19 @@ function updateBinaryInfo() {
   iina.onMessage("binaryInfo", ({ path, version, errorMessage }) => {
     let description,
       binaryLocation = "";
-    if (path === "youtube-dl") {
-      description = `You are using the yt-dlp binary bundled with IINA.
-        Since IINA's update frequency is lower than yt-dlp, it can be outdated and you may encounter issues.
-        It is recommended to download the latest version using the button below.`;
-    } else if (path === "@data/yt-dlp/yt-dlp_macos") {
-      description = `You are using the yt-dlp binary managed by this plugin. You can update it using the button below.`;
+    if (path === null) {
+      description = `Unable to find yt-dlp.
+        Troubleshooting:
+        - Reinstall IINA (IINA-bundled yt-dlp is missing)
+        - If you have an existing installation of yt-dlp,
+        either put it on $PATH or set its path in 'Plugins>Online Media>Settings>Use custom youtube-dl/yt-dlp'`;
+    } else if (path === "iina-ytdl") {
+      description = `You are using yt-dlp bundled with IINA.
+        It is recommended to keep it up to date using the button below.`;
     } else {
       binaryLocation = path;
-      description = `It seems that you are using a custom yt-dlp binary. You may need to update it manually.`;
+      description = `You are using yt-dlp configured by by you in plugin settings.
+        You may need to update it manually.`;
       document.getElementById("download-binary").style.display = "none";
     }
     if (errorMessage) {
