@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Status and Downloads</title>
+    <title>Online Media</title>
     <style>
         body {
             color-scheme: light dark;
@@ -40,40 +40,34 @@
         }
 
         .no-task {
-            padding: 10px;
+            padding: 5px;
         }
 
         h4 {
-            margin: 0;
-            padding: 8px;
+            padding: 5px;
             background: rgba(200, 200, 200, .6);
         }
 
-        .info-container {
-            padding: 10px 10px 0 10px;
+        button {
+            padding: 5px;
+            margin: 0px 0px 10px 10px;
         }
 
-        .binary-msg,
-        .download-container {
-            padding: 8px 0;
+        pre {
+            margin: 2px;
+            display: inline-block;
+            white-space: pre-wrap;
         }
 
-        .binary-msg {
-            color: rgba(0, 0, 0, .6);
-        }
-
-        #downloading {
+        #spinner-container {
             display: none;
             text-align: center;
             padding: 20px 10px 10px 10px;
         }
 
-        #downloading .message {
-            margin-bottom: 6px;
-        }
-
-        #download-error {
-            color: #ff3b30;
+        .result-containers {
+            padding: 5px;
+            display: none;
         }
 
         @media (prefers-color-scheme: dark) {
@@ -93,10 +87,6 @@
 
             h4 {
                 background: rgba(100, 100, 100, .6);
-            }
-
-            .binary-msg {
-                color: rgba(255, 255, 255, .7);
             }
         }
     </style>
@@ -172,33 +162,24 @@
 </head>
 
 <body>
-    <section id="status">
-        <h4>Status</h4>
-        <div class="info-container">
-            <button id="check-binary">Verify yt-dlp binary</button>
-            <div class="binary-msg" id="binary-desc"></div>
-            <div class="binary-msg" id="binary-version"></div>
-            <button id="download-binary">Download latest yt-dlp</button>
-            <div class="download-container">
-                <div id="downloading">
-                    <div class="message">
-                        Downloading yt-dlp. This may take minutes depending on your connection speed.
-                    </div>
-                    <div class="spinner">
-                        <div></div>
-                        <div></div>
-                        <div></div>
-                        <div></div>
-                    </div>
-                </div>
-                <div id="download-error"></div>
-                <div id="download-info"></div>
+    <section id="yt-dlp">
+        <h4>Yt-dlp</h4>
+        <button id="check-binary">Verify Installation</button>
+        <button id="download-binary">Update Now</button>
+        <div id="spinner-container">
+            <div id="spinner-message"></div>
+            <div class="spinner">
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
             </div>
         </div>
+        <div id="action-result" class="result-containers"></div>
     </section>
     <section id="downloads">
         <h4>Downloads</h4>
-        <div id="content"></div>
+        <div id="content" class="result-containers"></div>
     </section>
 </body>
 
