@@ -60,16 +60,18 @@ function showDownloadsWindow() {
     const res = await utils.exec(ytdl, ["--version"]);
     standaloneWindow.postMessage("binaryInfo", {
       path: ytdl,
-      version: res.stdout,
-      errorMessage: res.stderr,
+      res: res,
     });
   });
 
   standaloneWindow.onMessage("updateBinary", async () => {
-    if (opt.ytdl_path) return;
-    standaloneWindow.postMessage("updatingBinary", null);
+    if (opt.ytdl_path) {
+      standaloneWindow.postMessage("disableDownload", null);
+      return;
+    }
+    standaloneWindow.postMessage("actionInProgress", { msg: "Downloading..." });
     const res = await updateBinary();
-    standaloneWindow.postMessage("binaryUpdated", { res });
+    standaloneWindow.postMessage("actionDone", { res });
   });
 
   standaloneWindow.open();
