@@ -1,4 +1,4 @@
-import { downloadYTDLP, findBinary } from "./binary";
+import { downloadYTDLP, updateYTDLP, findBinary } from "./binary";
 import { downloadVideo, resetStatusNeedUpdate, statusNeedUpdate, tasks } from "./download";
 
 let { console, global, menu, standaloneWindow, file, utils } = iina;
@@ -6,7 +6,7 @@ let { console, global, menu, standaloneWindow, file, utils } = iina;
 // Menu
 
 menu.addItem(
-  menu.item("Manage yt-dlp and Downloads...", async () => {
+  menu.item("Manage yt-dlp and Downloads...", () => {
     showDownloadsWindow();
   }),
 );
@@ -14,10 +14,12 @@ menu.addItem(
 // Downloads window
 
 global.onMessage("downloadVideo", async (url, player) => {
-  if (url) {
+  if (url && player) {
     await downloadVideo(url.toString(), player);
     global.postMessage(player, "downloading", true);
     showDownloadsWindow();
+  } else {
+    console.error(`Invalid parameters for downloadVideo: url=${url}, player=${player}`);
   }
 });
 
@@ -37,7 +39,7 @@ function showDownloadsWindow() {
     fullSizeContentView: false,
     hideTitleBar: false,
   });
-  standaloneWindow.setFrame(320, 400);
+  standaloneWindow.setFrame(400, 460);
 
   standaloneWindow.onMessage("requestUpdate", ({ force }) => {
     if (!force && !statusNeedUpdate) return;
@@ -51,6 +53,11 @@ function showDownloadsWindow() {
 
   standaloneWindow.onMessage("revealFile", ({ fileName }) => {
     file.showInFinder(fileName);
+  });
+
+  standaloneWindow.onMessage("getBinaryPath", () => {
+    const path = findBinary();
+    standaloneWindow.postMessage("binaryPath", path);
   });
 
   standaloneWindow.onMessage("getBinaryInfo", async () => {
@@ -77,23 +84,17 @@ function showDownloadsWindow() {
     }
   });
 
-  standaloneWindow.onMessage("updateBinary", () => {
-    updateYTDLP();
+  standaloneWindow.onMessage("downloadBinary", async () => {
+    standaloneWindow.postMessage("updatingBinary", null);
+    let error = await downloadYTDLP();
+    standaloneWindow.postMessage("binaryUpdated", { updated: !error, error });
+  });
+
+  standaloneWindow.onMessage("updateManagedBinary", async () => {
+    standaloneWindow.postMessage("updatingBinary", null);
+    let error = await updateYTDLP();
+    standaloneWindow.postMessage("binaryUpdated", { updated: !error, error });
   });
 
   standaloneWindow.open();
-}
-
-// Update yt-dlp window
-
-async function updateYTDLP() {
-  standaloneWindow.postMessage("updatingBinary", null);
-  let error = await downloadYTDLP();
-  standaloneWindow.postMessage("binaryUpdated", { updated: !error, error });
-}
-
-async function showDownloadYTDLPWindow() {
-  showDownloadsWindow();
-  await new Promise((r) => setTimeout(r, 1000));
-  updateYTDLP();
 }

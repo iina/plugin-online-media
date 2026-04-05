@@ -61,7 +61,7 @@ export function edlEscape(url: string) {
 export function isSafeURL(url: string) {
   if (typeof url !== "string") return;
   const match = url.match(/^(.+?):\/\//);
-  if (match[1] && safeProtos.has(match[1])) {
+  if (match && match[1] && safeProtos.has(match[1])) {
     return true;
   }
   console.log(`Ignoring potentially unsafe url ${url}`);

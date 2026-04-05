@@ -34,16 +34,38 @@ export async function downloadYTDLP() {
     if (res.status !== 0) {
       throw new Error(`Failed to unzip yt-dlp: ${res.stderr}`);
     }
-  } catch (e) {
+  } catch (e: any) {
     console.error(e.toString());
     errorMessage = e.toString();
   } finally {
     try {
       if (file.exists(downloadedZip)) file.delete(downloadedZip);
       if (file.exists(unzipFolder)) file.delete(unzipFolder);
-    } catch (e1) {
+    } catch (e1: any) {
       console.error("Failed to delete temp files: " + e1.toString());
     }
+  }
+  return errorMessage;
+}
+
+export async function updateYTDLP() {
+  let errorMessage = null;
+  let path = findBinary();
+  if (path === "youtube-dl") {
+    errorMessage = "The binary is bundled inside IINA, which cannot be updated.";
+    console.error(errorMessage);
+    return errorMessage;
+  } else if (path.startsWith("@data")) {
+    path = utils.resolvePath(path);
+  }
+
+  console.log(`Updating yt-dlp at ${path}`);
+  const res = await utils.exec(path, ["-U"]);
+  if (res.status === 0) {
+    console.log("yt-dlp updated successfully.");
+  } else {
+    console.error(`Failed to update yt-dlp: ${res.stderr}`);
+    errorMessage = `Failed to update yt-dlp: ${res.stderr}`;
   }
   return errorMessage;
 }
@@ -59,4 +81,21 @@ export function findBinary(): string {
     }
   }
   return path;
+}
+
+export function findJSRuntime(): string | null {
+  const jsRuntime = opt.js_runtime;
+  if (jsRuntime) {
+    console.log(`Using user-specified JS runtime: ${jsRuntime}`);
+    return jsRuntime;
+  }
+  // try to find a runtime from the candidates
+  const candidates = ["deno", "node", "quickjs", "bun"];
+  for (const runtime of candidates) {
+    if (utils.fileInPath(runtime)) {
+      console.log(`Found JS runtime; using ${runtime}`);
+      return runtime;
+    }
+  }
+  return null;
 }

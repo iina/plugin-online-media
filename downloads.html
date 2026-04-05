@@ -16,6 +16,34 @@
             margin: 0;
         }
 
+        .text-secondary {
+            color: rgba(0, 0, 0, .6);
+            font-size: 85%;
+        }
+
+        .binary-status {
+            display: none;
+            padding: 10px;
+        }
+
+        .binary-status.status-bundled {
+            background: rgba(255, 59, 48, .1);
+        }
+
+        .binary-status.status-managed,
+        .binary-status.status-custom {
+            background: rgba(76, 217, 100, .1);
+        }
+
+        .binary-status .status-msg {
+            margin-bottom: 10px;
+        }
+
+        .binary-status .status-title {
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+
         .download-item {
             padding: 10px 10px 0 10px;
         }
@@ -55,24 +83,25 @@
 
         .binary-msg,
         .download-container {
-            padding: 8px 0;
+            padding: 8px 2px;
         }
 
-        .binary-msg {
-            color: rgba(0, 0, 0, .6);
-        }
-
-        #downloading {
+        .downloading {
             display: none;
             text-align: center;
             padding: 20px 10px 10px 10px;
         }
 
-        #downloading .message {
+        .downloading .message {
             margin-bottom: 6px;
         }
 
-        #download-error {
+        .download-error,
+        .download-info {
+            font-size: 85%;
+        }
+
+        .download-error {
             color: #ff3b30;
         }
 
@@ -95,7 +124,7 @@
                 background: rgba(100, 100, 100, .6);
             }
 
-            .binary-msg {
+            .text-secondary {
                 color: rgba(255, 255, 255, .7);
             }
         }
@@ -174,13 +203,16 @@
 <body>
     <section id="status">
         <h4>Status</h4>
-        <div class="info-container">
-            <button id="check-binary">Verify yt-dlp binary</button>
-            <div class="binary-msg" id="binary-desc"></div>
-            <div class="binary-msg" id="binary-version"></div>
+        <div class="binary-status status-bundled">
+            <div class="status-title">⚠ Not Found</div>
+            <div class="status-msg text-secondary">
+                No managed yt-dlp installation found. This means you are using the yt-dlp binary bundled with IINA.
+                It may not work correctly and will be deprecated in the future.
+                Please download the latest yt-dlp.
+            </div>
             <button id="download-binary">Download latest yt-dlp</button>
-            <div class="download-container">
-                <div id="downloading">
+            <div class="download-container" style="display: none;">
+                <div class="downloading">
                     <div class="message">
                         Downloading yt-dlp. This may take minutes depending on your connection speed.
                     </div>
@@ -191,9 +223,44 @@
                         <div></div>
                     </div>
                 </div>
-                <div id="download-error"></div>
-                <div id="download-info"></div>
+                <div class="download-error"></div>
+                <div class="download-info"></div>
             </div>
+        </div>
+        <div class="binary-status status-managed">
+            <div class="status-title">Managed</div>
+            <div class="status-msg text-secondary">
+                You are using a yt-dlp installation managed by this plugin.
+            </div>
+            <button id="update-managed-binary">Update yt-dlp</button>
+            <div class="download-container" style="display: none;">
+                <div class="downloading">
+                    <div class="message">
+                        Downloading yt-dlp. This may take minutes depending on your connection speed.
+                    </div>
+                    <div class="spinner">
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                    </div>
+                </div>
+                <div class="download-error"></div>
+                <div class="download-info"></div>
+            </div>
+        </div>
+        <div class="binary-status status-custom">
+            <div class="status-title">Custom Binary</div>
+            <div class="status-msg text-secondary">
+                You are using your own custom yt-dlp binary. You may need to update it manually.
+            </div>
+        </div>
+        <div class="info-container">
+            <button id="check-binary">Verify yt-dlp binary</button>
+            <div class="binary-msg text-secondary" id="binary-desc">
+                This will print out information about your yt-dlp binary to make sure it is functioning correctly.
+            </div>
+            <div class="binary-msg text-secondary" id="binary-version"></div>
         </div>
     </section>
     <section id="downloads">

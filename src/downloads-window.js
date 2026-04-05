@@ -25,19 +25,37 @@ function init() {
   });
 
   iina.onMessage("updatingBinary", () => {
-    document.getElementById("download-error").textContent = "";
-    document.getElementById("download-info").textContent = "";
-    document.getElementById("downloading").style.display = "block";
+    const downloadContainer = Array.prototype.find.call(
+      document.querySelectorAll(".download-container"),
+      (el) => el.style.display === "block",
+    );
+    if (!downloadContainer) {
+      console.error("No active download container found for updatingBinary message");
+      return;
+    }
+    downloadContainer.querySelector(".download-error").textContent = "";
+    downloadContainer.querySelector(".download-info").textContent = "";
+    downloadContainer.querySelector(".downloading").style.display = "block";
   });
 
   iina.onMessage("binaryUpdated", ({ updated, error }) => {
-    document.getElementById("downloading").style.display = "none";
+    const downloadContainer = Array.prototype.find.call(
+      document.querySelectorAll(".download-container"),
+      (el) => el.style.display === "block",
+    );
+    if (!downloadContainer) {
+      console.error("No active download container found for binaryUpdated message");
+      return;
+    }
+    downloadContainer.querySelector(".downloading").style.display = "none";
     if (updated) {
-      document.getElementById("download-info").textContent =
+      downloadContainer.querySelector(".download-info").textContent =
         "Binary updated successfully. Please allow a few seconds preparing and verifying the new binary.";
-      updateBinaryInfo();
+      verifyBinaryInfo();
     } else {
-      document.getElementById("download-error").textContent = `Failed to update binary: ${error}`;
+      downloadContainer.querySelector(
+        ".download-error",
+      ).textContent = `Failed to update binary: ${error}`;
     }
   });
 
@@ -50,11 +68,22 @@ function init() {
   };
 
   document.getElementById("check-binary").addEventListener("click", () => {
-    updateBinaryInfo();
+    verifyBinaryInfo();
   });
 
   document.getElementById("download-binary").addEventListener("click", () => {
-    iina.postMessage("updateBinary");
+    document.querySelector(".status-bundled .download-container").style.display = "block";
+    iina.postMessage("downloadBinary");
+  });
+
+  document.getElementById("update-managed-binary").addEventListener("click", () => {
+    document.querySelector(".status-managed .download-container").style.display = "block";
+    iina.postMessage("updateManagedBinary");
+  });
+
+  iina.postMessage("getBinaryPath");
+  iina.onMessage("binaryPath", (path) => {
+    updateBinaryStatus(path);
   });
 }
 
@@ -68,18 +97,37 @@ function b64_to_utf8(str) {
   return decodeURIComponent(escape(window.atob(str)));
 }
 
-function updateBinaryInfo() {
+function updateBinaryStatus(path) {
+  console.log("Updating binary status:", path);
+  let statusClassName;
+  if (!path || path === "youtube-dl") {
+    statusClassName = "bundled";
+  } else if (path === "@data/yt-dlp/yt-dlp_macos") {
+    statusClassName = "managed";
+  } else {
+    statusClassName = "custom";
+  }
+  document.querySelectorAll(".binary-status").forEach((el) => {
+    el.style.display = "none";
+  });
+  const el = document.querySelector(`.binary-status.status-${statusClassName}`);
+  if (el) {
+    el.style.display = "block";
+  }
+}
+
+function verifyBinaryInfo() {
   document.getElementById("binary-desc").textContent = "Checking for yt-dlp binary...";
   iina.postMessage("getBinaryInfo");
   iina.onMessage("binaryInfo", ({ path, version, errorMessage }) => {
     let description,
       binaryLocation = "";
     if (path === "youtube-dl") {
-      description = `You are using the yt-dlp binary bundled with IINA.
-        Since IINA's update frequency is lower than yt-dlp, it can be outdated and you may encounter issues.
+      description = `You are using the yt-dlp bundled with IINA. This will be deprecated in the future.
         It is recommended to download the latest version using the button below.`;
     } else if (path === "@data/yt-dlp/yt-dlp_macos") {
-      description = `You are using the yt-dlp binary managed by this plugin. You can update it using the button below.`;
+      const managedPath = `~/Application Support/com.colliderli.iina/plugins/.data/io.iina.ytdl/yt-dlp`;
+      description = `You are using the yt-dlp installation managed by this plugin. The binary is located at ${managedPath}.`;
     } else {
       binaryLocation = path;
       description = `It seems that you are using a custom yt-dlp binary. You may need to update it manually.`;
@@ -95,6 +143,7 @@ function updateBinaryInfo() {
       document.getElementById("binary-version").innerHTML = message;
     }
     document.getElementById("binary-desc").textContent = description;
+    updateBinaryStatus(path);
   });
 }
 
