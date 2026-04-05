@@ -16,10 +16,12 @@ const safeProtos = new Set([
 
 export function ytdlCodecToMpvCodec(codec: string) {
   if (codec === "vtt") return "webvtt";
-  if (codec === "opus" || codec === "vp9") return codec;
+  if (codec === "opus") return "opus";
+  if (codec.startsWith("vp9")) return "vp9";
   if (codec.startsWith("avc")) return "h264";
   if (codec.startsWith("av0")) return "av1";
-  if (codec.startsWith("mp4")) return "aac";
+  if (codec.startsWith("mp4a")) return "aac";
+  if (codec.startsWith("hev1")) return "hevc";
   return null;
 }
 
@@ -31,7 +33,7 @@ export function optionWasSetLocally(name: string) {
   return mpv.getFlag(`"option-info/${name}/set-locally"`);
 }
 
-export function setHTTPHeaders(headers: Record<string, string>) {
+export function setHTTPHeaders(headers?: Record<string, string>) {
   if (!headers) return;
 
   const ua = headers["User-Agent"];

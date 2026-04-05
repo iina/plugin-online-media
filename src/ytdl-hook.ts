@@ -169,7 +169,7 @@ function ytdlSuccess(url: string, json: YTDL.Entity, option: TempOption) {
         // there might not be subs for the first segment
         const entryWithSubs = json.entries.find((entry) => entry.requested_subtitles);
         if (entryWithSubs && entryWithSubs.duration) {
-          const subs = entryWithSubs.requested_subtitles;
+          const subs = entryWithSubs.requested_subtitles!;
           Object.keys(subs).forEach((lang) => {
             let subFile = "edl://";
             for (const entry of json.entries) {
@@ -203,6 +203,10 @@ function ytdlSuccess(url: string, json: YTDL.Entity, option: TempOption) {
 
         if (entry.webpage_url && !isSelfRedirectingURL) {
           site = entry.webpage_url;
+        }
+
+        if (!site) {
+          continue;
         }
 
         if (site.indexOf("://") < 0) {

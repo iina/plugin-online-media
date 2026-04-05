@@ -58,7 +58,7 @@ declare namespace YTDL {
     formats?: Video[];
     requested_formats?: Video[];
 
-    proxy?: string;
+    proxy?: string | null;
 
     extractor: string;
     extractor_key: string;
