@@ -94,6 +94,7 @@ function processVideo(reqfmts: YTDL.Video[], json?: YTDL.Entity) {
         // according to ytdl, if vcodec is None, it's audio
         mpv.command("audio-add", [edlTrack || track.url, "auto", track.format_note || ""]);
       }
+      setHTTPHeaders(track.http_headers);
     }
   } else if (json.url) {
     const edlTrack = edlTrackJoined(
