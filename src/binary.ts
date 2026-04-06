@@ -148,3 +148,22 @@ export function findJSRuntime(): string | null {
   }
   return null;
 }
+
+export async function logVersion(): Promise<void> {
+  const path = findBinary();
+  try {
+    const res = await utils.exec(path, ["--version"]);
+    if (res.status === 0) {
+      const version = res.stdout;
+      // remove trailing newline
+      const cleanVersion = version.substring(0, version.length - 1);
+      console.log("Version: " + cleanVersion);
+    } else {
+      const errorMessage =
+        "Error when executing the binary: " + (res.stderr ? res.stderr : "No error message");
+      console.log(errorMessage);
+    }
+  } catch (err) {
+    console.warn(err);
+  }
+}
