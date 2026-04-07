@@ -10,7 +10,7 @@ import { addVideo, isSwitchingFormat } from "./add-video";
 import { opt } from "./options";
 import { findBinary } from "./binary";
 
-const { core, console, mpv, utils } = iina;
+const { core, console, mpv, utils, global } = iina;
 
 export let currentURL: string;
 
@@ -97,16 +97,30 @@ export async function runYTDLHook(url: string) {
     args.push("--no-playlist");
   }
 
-  args.push("--", url);
-
   try {
     console.log("Running youtube-dl...");
 
     // find the binary
-    const ytdl = findBinary();
+    const { path, jsRuntime } = await findBinary();
+
+    if (jsRuntime) {
+      const resolvedJsRuntime = utils.resolvePath(jsRuntime);
+      console.log(`Using JS runtime: ${resolvedJsRuntime}`);
+      args.push("--js-runtimes", resolvedJsRuntime);
+    }
+
+    args.push("--", url);
+
+    // if there's no JS runtime, alert the user
+    // let's don't be intrusive for now
+    // const notUsingCustomBinary = path === "youtube-dl" || path.startsWith("@data");
+    // if (notUsingCustomBinary && !jsRuntime) {
+    //   // the window should warn the user about missing JS runtime
+    //   global.postMessage("showWindow", null);
+    // }
 
     // execute
-    const out = await utils.exec(ytdl, args);
+    const out = await utils.exec(path, args);
     if (out.status !== 0) {
       core.osd("Failed to run youtube-dl");
       console.error(`Error running youtube-dl: ${out.stderr}`);

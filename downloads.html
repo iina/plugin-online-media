@@ -21,12 +21,14 @@
             font-size: 85%;
         }
 
-        .binary-status {
+        .binary-status,
+        #js-runtime-alert {
             display: none;
             padding: 10px;
         }
 
-        .binary-status.status-bundled {
+        .binary-status.status-bundled,
+        #js-runtime-alert {
             background: rgba(255, 59, 48, .1);
         }
 
@@ -35,11 +37,13 @@
             background: rgba(76, 217, 100, .1);
         }
 
-        .binary-status .status-msg {
+        .binary-status .status-msg,
+        #js-runtime-alert .status-msg {
             margin-bottom: 10px;
         }
 
-        .binary-status .status-title {
+        .binary-status .status-title,
+        #js-runtime-alert .status-title {
             font-weight: bold;
             margin-bottom: 4px;
         }
@@ -233,6 +237,7 @@
                 You are using a yt-dlp installation managed by this plugin.
             </div>
             <button id="update-managed-binary">Update yt-dlp</button>
+            <button id="show-binary-in-finder">Show in Finder</button>
             <div class="download-container" style="display: none;">
                 <div class="downloading">
                     <div class="message">
@@ -253,6 +258,31 @@
             <div class="status-title">Custom Binary</div>
             <div class="status-msg text-secondary">
                 You are using your own custom yt-dlp binary. You may need to update it manually.
+            </div>
+        </div>
+        <div id="js-runtime-alert">
+            <div class="status-title">JavaScript Runtime Required</div>
+            <div class="status-msg text-secondary">
+                yt-dlp requires a JavaScript runtime for Youtube videos.
+                If you have any of the supported runtimes installed (Deno, Node, QuickJS, Bun),
+                please <b>specify the path in the plugin settings.</b>
+                The plugin can also download and use Deno for you, which takes about 80MB of disk space.
+            </div>
+            <button id="download-deno">Download JavaScript Runtime</button>
+            <div class="download-container" style="display: none;">
+                <div class="downloading">
+                    <div class="message">
+                        Downloading Deno. This may take minutes depending on your connection speed.
+                    </div>
+                    <div class="spinner">
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                    </div>
+                </div>
+                <div class="download-error"></div>
+                <div class="download-info"></div>
             </div>
         </div>
         <div class="info-container">

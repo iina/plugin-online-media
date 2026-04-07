@@ -26,7 +26,8 @@ class DownloadTask {
     public filename: string,
     public destFolder: string,
     public ytdl: string,
-    public format: string,
+    public jsRuntime: string,
+    public format: string | null,
   ) {}
 
   get dest() {
@@ -37,6 +38,11 @@ class DownloadTask {
     const args: string[] = [];
     args.push("-P", this.destFolder);
     // args.push("--format", this.format);
+    if (this.jsRuntime) {
+      const resolvedJsRuntime = utils.resolvePath(this.jsRuntime);
+      console.log(`Using JS runtime: ${resolvedJsRuntime}`);
+      args.push("--js-runtimes", resolvedJsRuntime);
+    }
     args.push(
       "--progress-template",
       "!!%(progress.downloaded_bytes)s-%(progress.total_bytes)s-%(progress.eta)s",
@@ -104,14 +110,17 @@ export async function downloadVideo(url: string, player: string) {
   // console.log(`FFmpeg found: ${hasFFmpeg}; using format: ${format}`);
   const format = null;
 
-  const ytdl = findBinary();
-  const filename = (await utils.exec(ytdl, ["--get-filename", url])).stdout.replaceAll("\n", "");
+  const { path, jsRuntime } = await findBinary();
+  const resolvedJsRuntime = jsRuntime ? utils.resolvePath(jsRuntime) : null;
+  const filename = (
+    await utils.exec(path, ["--js-runtimes", jsRuntime, "--get-filename", url])
+  ).stdout.replaceAll("\n", "");
   console.log(filename);
 
   let destFolder = `~/Downloads`;
   const args: string[] = [];
 
-  const task = new DownloadTask(player, url, filename, destFolder, ytdl, format);
+  const task = new DownloadTask(player, url, filename, destFolder, path, format);
   tasks.push(task);
   task.start();
 }

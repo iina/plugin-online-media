@@ -7,6 +7,9 @@ export const opt = {
   get ytdl_path(): string {
     return preferences.get("ytdl_path");
   },
+  get js_runtime(): string {
+    return preferences.get("js_runtime");
+  },
   get try_ytdl_first(): boolean {
     return preferences.get("try_ytdl_first");
   },

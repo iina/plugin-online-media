@@ -38,6 +38,17 @@ function init() {
     downloadContainer.querySelector(".downloading").style.display = "block";
   });
 
+  iina.onMessage("downloadingDeno", () => {
+    const downloadContainer = document.querySelector("#js-runtime-alert .download-container");
+    if (!downloadContainer) {
+      console.error("No download container found for downloadingDeno message");
+      return;
+    }
+    downloadContainer.querySelector(".download-error").textContent = "";
+    downloadContainer.querySelector(".download-info").textContent = "";
+    downloadContainer.querySelector(".downloading").style.display = "block";
+  });
+
   iina.onMessage("binaryUpdated", ({ updated, error }) => {
     const downloadContainer = Array.prototype.find.call(
       document.querySelectorAll(".download-container"),
@@ -56,6 +67,22 @@ function init() {
       downloadContainer.querySelector(
         ".download-error",
       ).textContent = `Failed to update binary: ${error}`;
+    }
+  });
+
+  iina.onMessage("denoDownloaded", ({ downloaded, error }) => {
+    const downloadContainer = document.querySelector("#js-runtime-alert .download-container");
+    downloadContainer.querySelector(".downloading").style.display = "none";
+    if (downloaded) {
+      downloadContainer.querySelector(".download-info").textContent =
+        "Deno downloaded successfully.";
+      setTimeout(() => {
+        verifyBinaryInfo();
+      }, 2000);
+    } else {
+      downloadContainer.querySelector(
+        ".download-error",
+      ).textContent = `Failed to download Deno: ${error}`;
     }
   });
 
@@ -81,6 +108,15 @@ function init() {
     iina.postMessage("updateManagedBinary");
   });
 
+  document.getElementById("show-binary-in-finder").addEventListener("click", () => {
+    iina.postMessage("showBinaryInFinder");
+  });
+
+  document.getElementById("download-deno").addEventListener("click", () => {
+    document.querySelector("#js-runtime-alert .download-container").style.display = "block";
+    iina.postMessage("downloadDeno");
+  });
+
   iina.postMessage("getBinaryPath");
   iina.onMessage("binaryPath", (path) => {
     updateBinaryStatus(path);
@@ -97,8 +133,8 @@ function b64_to_utf8(str) {
   return decodeURIComponent(escape(window.atob(str)));
 }
 
-function updateBinaryStatus(path) {
-  console.log("Updating binary status:", path);
+function updateBinaryStatus({ path, jsRuntime }) {
+  console.log("Updating binary status:", path, jsRuntime);
   let statusClassName;
   if (!path || path === "youtube-dl") {
     statusClassName = "bundled";
@@ -114,12 +150,18 @@ function updateBinaryStatus(path) {
   if (el) {
     el.style.display = "block";
   }
+
+  // We assume a custom binary (almost always installed by a package manager) has built-in JS runtime support
+  const shouldShowJsRuntimeAlert = statusClassName !== "custom" && !jsRuntime;
+  document.getElementById("js-runtime-alert").style.display = shouldShowJsRuntimeAlert
+    ? "block"
+    : "none";
 }
 
 function verifyBinaryInfo() {
   document.getElementById("binary-desc").textContent = "Checking for yt-dlp binary...";
   iina.postMessage("getBinaryInfo");
-  iina.onMessage("binaryInfo", ({ path, version, errorMessage }) => {
+  iina.onMessage("binaryInfo", ({ path, version, jsRuntime, errorMessage }) => {
     let description,
       binaryLocation = "";
     if (path === "youtube-dl") {
@@ -143,7 +185,7 @@ function verifyBinaryInfo() {
       document.getElementById("binary-version").innerHTML = message;
     }
     document.getElementById("binary-desc").textContent = description;
-    updateBinaryStatus(path);
+    updateBinaryStatus({ path, jsRuntime });
   });
 }
 

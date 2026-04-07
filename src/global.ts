@@ -1,4 +1,4 @@
-import { downloadYTDLP, updateYTDLP, findBinary } from "./binary";
+import { downloadYTDLP, updateYTDLP, downloadDeno, findBinary } from "./binary";
 import { downloadVideo, resetStatusNeedUpdate, statusNeedUpdate, tasks } from "./download";
 
 let { console, global, menu, standaloneWindow, file, utils } = iina;
@@ -12,6 +12,10 @@ menu.addItem(
 );
 
 // Downloads window
+
+global.onMessage("showWindow", () => {
+  showDownloadsWindow();
+});
 
 global.onMessage("downloadVideo", async (url, player) => {
   if (url && player) {
@@ -55,13 +59,17 @@ function showDownloadsWindow() {
     file.showInFinder(fileName);
   });
 
-  standaloneWindow.onMessage("getBinaryPath", () => {
-    const path = findBinary();
-    standaloneWindow.postMessage("binaryPath", path);
+  standaloneWindow.onMessage("showBinaryInFinder", async () => {
+    file.showInFinder("@data/");
+  });
+
+  standaloneWindow.onMessage("getBinaryPath", async () => {
+    const res = await findBinary();
+    standaloneWindow.postMessage("binaryPath", res);
   });
 
   standaloneWindow.onMessage("getBinaryInfo", async () => {
-    const path = findBinary();
+    const { path, jsRuntime } = await findBinary();
     console.log("Binary path: " + path);
     const res = await utils.exec(path, ["--version"]);
     if (res.status === 0) {
@@ -70,6 +78,7 @@ function showDownloadsWindow() {
       standaloneWindow.postMessage("binaryInfo", {
         path,
         version,
+        jsRuntime,
         errorMessage: "",
       });
     } else {
@@ -79,6 +88,7 @@ function showDownloadsWindow() {
       standaloneWindow.postMessage("binaryInfo", {
         path,
         version: "",
+        jsRuntime,
         errorMessage,
       });
     }
@@ -88,6 +98,12 @@ function showDownloadsWindow() {
     standaloneWindow.postMessage("updatingBinary", null);
     let error = await downloadYTDLP();
     standaloneWindow.postMessage("binaryUpdated", { updated: !error, error });
+  });
+
+  standaloneWindow.onMessage("downloadDeno", async () => {
+    standaloneWindow.postMessage("downloadingDeno", null);
+    let error = await downloadDeno();
+    standaloneWindow.postMessage("denoDownloaded", { downloaded: !error, error });
   });
 
   standaloneWindow.onMessage("updateManagedBinary", async () => {

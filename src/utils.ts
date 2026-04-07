@@ -170,6 +170,7 @@ export function formatFileSize(bytes: number, si = false, dp = 1) {
   return bytes.toFixed(dp) + " " + units[u];
 }
 
-export function formatSeconds(sec: number) {
+export function formatSeconds(sec: number | null | undefined) {
+  if (sec == null || isNaN(sec)) return "-";
   return new Date(sec * 1000).toISOString().substring(sec < 3600 ? 14 : 11, 19);
 }
