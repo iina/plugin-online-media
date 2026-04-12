@@ -1,7 +1,11 @@
-import { downloadYTDLP, updateYTDLP, downloadDeno, findBinary } from "./binary";
+import { downloadYTDLP, updateYTDLP, downloadDeno, findBinary, logVersion } from "./binary";
 import { downloadVideo, resetStatusNeedUpdate, statusNeedUpdate, tasks } from "./download";
 
 let { console, global, menu, standaloneWindow, file, utils } = iina;
+
+// Initialization
+
+logVersion();
 
 // Menu
 
