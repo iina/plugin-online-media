@@ -1,4 +1,4 @@
-import { downloadYTDLP, updateYTDLP, downloadDeno, findBinary } from "./binary";
+import { downloadYTDLP, downloadDeno, findBinary } from "./binary";
 import { downloadVideo, resetStatusNeedUpdate, statusNeedUpdate, tasks } from "./download";
 
 let { console, global, menu, standaloneWindow, file, utils } = iina;
@@ -108,7 +108,7 @@ function showDownloadsWindow() {
 
   standaloneWindow.onMessage("updateManagedBinary", async () => {
     standaloneWindow.postMessage("updatingBinary", null);
-    let error = await updateYTDLP();
+    let error = await downloadYTDLP();
     standaloneWindow.postMessage("binaryUpdated", { updated: !error, error });
   });
 

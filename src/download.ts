@@ -39,9 +39,7 @@ class DownloadTask {
     args.push("-P", this.destFolder);
     // args.push("--format", this.format);
     if (this.jsRuntime) {
-      const resolvedJsRuntime = utils.resolvePath(this.jsRuntime);
-      console.log(`Using JS runtime: ${resolvedJsRuntime}`);
-      args.push("--js-runtimes", resolvedJsRuntime);
+      args.push("--js-runtimes", this.jsRuntime);
     }
     args.push(
       "--progress-template",
@@ -111,7 +109,7 @@ export async function downloadVideo(url: string, player: string) {
   const format = null;
 
   const { path, jsRuntime } = await findBinary();
-  const resolvedJsRuntime = jsRuntime ? utils.resolvePath(jsRuntime) : null;
+  const resolvedJsRuntime = jsRuntime ? utils.resolvePath(jsRuntime) : "";
   const filename = (
     await utils.exec(path, ["--js-runtimes", jsRuntime, "--get-filename", url])
   ).stdout.replaceAll("\n", "");
@@ -120,7 +118,7 @@ export async function downloadVideo(url: string, player: string) {
   let destFolder = `~/Downloads`;
   const args: string[] = [];
 
-  const task = new DownloadTask(player, url, filename, destFolder, path, format);
+  const task = new DownloadTask(player, url, filename, destFolder, path, resolvedJsRuntime, format);
   tasks.push(task);
   task.start();
 }

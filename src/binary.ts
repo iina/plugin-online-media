@@ -88,27 +88,6 @@ export async function downloadYTDLP() {
   return errorMessage;
 }
 
-export async function updateYTDLP() {
-  let errorMessage = null;
-  let { path, jsRuntime } = await findBinary();
-
-  if (!path.startsWith("@data")) {
-    errorMessage = `The binary at ${path} is not managed by the plugin.`;
-    console.error(errorMessage);
-    return errorMessage;
-  }
-
-  console.log(`Updating yt-dlp at ${path}`);
-  const res = await utils.exec(path, ["-U"]);
-  if (res.status === 0) {
-    console.log("yt-dlp updated successfully.");
-  } else {
-    console.error(`Failed to update yt-dlp: ${res.stderr}`);
-    errorMessage = `Failed to update yt-dlp: ${res.stderr}`;
-  }
-  return errorMessage;
-}
-
 export async function findBinary(): Promise<{ path: string; jsRuntime: string }> {
   let path = "youtube-dl";
   const searchList = [opt.ytdl_path, "@data/yt-dlp/yt-dlp_macos", "yt-dlp", "youtube-dl"];
