@@ -8,7 +8,7 @@ import {
 } from "./utils";
 import { addVideo, isSwitchingFormat } from "./add-video";
 import { opt } from "./options";
-import { findBinary } from "./binary";
+import { findBinary, jsRuntimeOption } from "./binary";
 
 const { core, console, mpv, utils, global } = iina;
 
@@ -105,8 +105,15 @@ export async function runYTDLHook(url: string) {
 
     if (jsRuntime) {
       const resolvedJsRuntime = utils.resolvePath(jsRuntime);
-      console.log(`Using JS runtime: ${resolvedJsRuntime}`);
-      args.push("--js-runtimes", resolvedJsRuntime);
+      const jsRuntimesValue = jsRuntimeOption(resolvedJsRuntime);
+      if (jsRuntimesValue) {
+        console.log(`Using JS runtime: ${resolvedJsRuntime}`);
+        args.push("--js-runtimes", jsRuntimesValue);
+      } else {
+        console.warn(
+          `${resolvedJsRuntime} is not named after a JS runtime yt-dlp supports, ignoring it`
+        );
+      }
     }
 
     args.push("--", url);

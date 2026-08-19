@@ -5,6 +5,9 @@ const { core, console, http, file, utils } = iina;
 const YTDLP_URL = "https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp_macos.zip";
 const DENO_URL = "https://github.com/denoland/deno/releases/latest/download/";
 
+// JS runtimes supported by yt-dlp, in its order of priority.
+const JS_RUNTIMES = ["deno", "node", "quickjs", "bun"];
+
 export async function downloadDeno() {
   const res = await utils.exec("/bin/bash", ["-c", `uname -m`]);
   if (res.status !== 0) {
@@ -118,12 +121,26 @@ export function findJSRuntime(): string | null {
     return jsRuntime;
   }
   // try to find a runtime from the candidates
-  const candidates = ["deno", "node", "quickjs", "bun"];
-  for (const runtime of candidates) {
+  for (const runtime of JS_RUNTIMES) {
     if (utils.fileInPath(runtime)) {
       console.log(`Found JS runtime; using ${runtime}`);
       return runtime;
     }
   }
   return null;
+}
+
+/**
+ * Build the value for yt-dlp's `--js-runtimes RUNTIME[:PATH]` option.
+ *
+ * yt-dlp needs the runtime name; given only a path it logs
+ * "Ignoring unsupported JavaScript runtime(s)" and carries on without a
+ * runtime. The preference asks for the full path to the binary, so the name
+ * is taken from its file name.
+ *
+ * Returns null when the file name is not a runtime yt-dlp supports.
+ */
+export function jsRuntimeOption(runtimePath: string): string | null {
+  const name = runtimePath.split("/").pop() || "";
+  return JS_RUNTIMES.includes(name) ? `${name}:${runtimePath}` : null;
 }
