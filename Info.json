@@ -18,6 +18,7 @@
   "preferenceDefaults": {
     "ytdl_path": "",
     "js_runtime": "",
+    "ffmpeg_path": "",
     "excluded_urls": "",
     "try_ytdl_first": false,
     "use_manifests": false,

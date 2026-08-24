@@ -194,6 +194,9 @@ const TEMPLATE = `
 {{#data}}
 <div class="download-item">
 <div class="filename">{{filename}}</div>
+{{#warning}}
+<div class="download-warning">{{warning}}</div>
+{{/warning}}
 <div class="progress">
 <div class="left">
 {{#is_pending}}

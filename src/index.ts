@@ -43,3 +43,7 @@ global.onMessage("downloading", () => {
 global.onMessage("downloaded", () => {
   core.osd("Video downloaded");
 });
+
+global.onMessage("downloadWarning", (message) => {
+  core.osd(message.toString());
+});

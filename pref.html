@@ -68,6 +68,18 @@
     </div>
   </div>
   <div class="pref-section">
+    FFmpeg:
+    <p class="small secondary pref-help">
+      Enter the path to the ffmpeg binary. ffmpeg is required for yt-dlp to merge the best separate video and audio
+      streams when downloading.
+      If you are using Homebrew, the path is usually <code>/opt/homebrew/bin/ffmpeg</code> for Apple Silicon Macs and
+      <code>/usr/local/bin/ffmpeg</code> for Intel Macs.
+    </p>
+    <div style="margin-top: 2px">
+      <input type="text" data-pref-key="ffmpeg_path" style="width: 100%; margin-top: 2px" />
+    </div>
+  </div>
+  <div class="pref-section">
     Default video and audio quality:
     <div style="margin-top: 4px; line-height: 24px">
       <div>

@@ -10,6 +10,9 @@ export const opt = {
   get js_runtime(): string {
     return preferences.get("js_runtime");
   },
+  get ffmpeg_path(): string {
+    return preferences.get("ffmpeg_path");
+  },
   get try_ytdl_first(): boolean {
     return preferences.get("try_ytdl_first");
   },
