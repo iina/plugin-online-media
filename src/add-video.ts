@@ -199,6 +199,23 @@ function formatDescription(f: YTDL._BaseEntity): string {
 export function addVideo(json: YTDL.Entity) {
   let reqfmts = json.requested_formats;
 
+  // add to menu
+  console.log("reconstruct menu");
+
+  menu.removeAllItems();
+  menu.addItem(menu.separator());
+
+  menu.addItem(
+    menu.item(
+      "Download this video",
+      () => {
+        core.osd("Preparing for download");
+        global.postMessage("downloadVideo", currentURL);
+      },
+      { keyBinding: "Meta+d" },
+    ),
+  );
+
   if (json.formats && json.requested_formats) {
     // live streams can have no requested_formats
     if (isSwitchingFormat) {
@@ -212,23 +229,6 @@ export function addVideo(json: YTDL.Entity) {
       currentVideoFormat = json.requested_formats.find((f) => f.vcodec !== "none").format_id;
       currentAudioFormat = json.requested_formats.find((f) => f.vcodec === "none").format_id;
     }
-
-    // add to menu
-    console.log("reconstruct menu");
-
-    menu.removeAllItems();
-    menu.addItem(menu.separator());
-
-    menu.addItem(
-      menu.item(
-        "Download this video",
-        () => {
-          core.osd("Preparing for download");
-          global.postMessage("downloadVideo", currentURL);
-        },
-        { keyBinding: "Meta+d" },
-      ),
-    );
 
     const videoItem = menu.item("Video Quality");
     const audioItem = menu.item("Audio Quality");
@@ -262,8 +262,8 @@ export function addVideo(json: YTDL.Entity) {
     }
     menu.addItem(videoItem);
     menu.addItem(audioItem);
-    menu.forceUpdate();
   }
 
+  menu.forceUpdate();
   processVideo(reqfmts, json);
 }
