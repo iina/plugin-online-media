@@ -1,5 +1,6 @@
 import { findBinary } from "./binary";
 import { updateDownloadsWindow } from "./global";
+import { opt } from "./options";
 import { formatFileSize, formatSeconds } from "./utils";
 
 const { console, global, utils } = iina;
@@ -28,6 +29,7 @@ class DownloadTask {
     public ytdl: string,
     public jsRuntime: string,
     public format: string | null,
+    public ytdlOptions: string[],
   ) {}
 
   get dest() {
@@ -41,6 +43,7 @@ class DownloadTask {
     if (this.jsRuntime) {
       args.push("--js-runtimes", this.jsRuntime);
     }
+    args.push(...this.ytdlOptions);
     args.push(
       "--progress-template",
       "!!%(progress.downloaded_bytes)s-%(progress.total_bytes)s-%(progress.eta)s",
@@ -101,6 +104,29 @@ class DownloadTask {
   }
 }
 
+function getDownloadOptions(): string[] {
+  const args: string[] = [];
+  let usePlaylist = false;
+
+  opt.rawOptions.split(" ").forEach((rawArg) => {
+    let arg = rawArg;
+    if (rawArg.includes("—")) {
+      arg = rawArg.replace("—", "--");
+      console.warn(`Argument ${rawArg} contains "—", trying to autocorrect`);
+    }
+    if (arg === "--yes-playlist") {
+      usePlaylist = true;
+    }
+    if (arg) args.push(arg);
+  });
+
+  if (!usePlaylist) {
+    args.push("--no-playlist");
+  }
+
+  return args;
+}
+
 export async function downloadVideo(url: string, player: string) {
   // const hasFFmpeg =
   //   (await utils.exec("/bin/bash", ["-c", "'which ffmpeg'"])).status === 0;
@@ -110,15 +136,27 @@ export async function downloadVideo(url: string, player: string) {
 
   const { path, jsRuntime } = await findBinary();
   const resolvedJsRuntime = jsRuntime ? utils.resolvePath(jsRuntime) : "";
-  const filename = (
-    await utils.exec(path, ["--js-runtimes", jsRuntime, "--get-filename", url])
-  ).stdout.replaceAll("\n", "");
+  const ytdlOptions = getDownloadOptions();
+  const filenameArgs = [...ytdlOptions];
+  if (resolvedJsRuntime) {
+    filenameArgs.push("--js-runtimes", resolvedJsRuntime);
+  }
+  filenameArgs.push("--get-filename", "--", url);
+  const filename = (await utils.exec(path, filenameArgs)).stdout.replaceAll("\n", "");
   console.log(filename);
 
   let destFolder = `~/Downloads`;
-  const args: string[] = [];
 
-  const task = new DownloadTask(player, url, filename, destFolder, path, resolvedJsRuntime, format);
+  const task = new DownloadTask(
+    player,
+    url,
+    filename,
+    destFolder,
+    path,
+    resolvedJsRuntime,
+    format,
+    ytdlOptions,
+  );
   tasks.push(task);
   task.start();
 }
