@@ -87,8 +87,11 @@ export async function runYTDLHook(url: string) {
     if (arg) args.push(arg);
   });
 
-  if (allsubs && includeSubs) {
-    args.push("--sub-langs", "all");
+  if (includeSubs) {
+    args.push("--write-subs");
+    if (allsubs) {
+      args.push("--sub-langs", "all");
+    }
   }
   if (includeAutoSubs) {
     args.push("--write-auto-subs");
