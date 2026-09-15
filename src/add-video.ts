@@ -94,7 +94,7 @@ function processVideo(reqfmts: YTDL.Video[], json?: YTDL.Entity) {
         // according to ytdl, if vcodec is None, it's audio
         mpv.command("audio-add", [edlTrack || track.url, "auto", track.format_note || ""]);
       }
-      setHTTPHeaders(track.http_headers);
+      setHTTPHeaders(track.http_headers, json.cookies);
     }
   } else if (json.url) {
     const edlTrack = edlTrackJoined(
@@ -107,7 +107,7 @@ function processVideo(reqfmts: YTDL.Video[], json?: YTDL.Entity) {
 
     // normal video or single track
     streamURL = edlTrack || json.url;
-    setHTTPHeaders(json.http_headers);
+    setHTTPHeaders(json.http_headers, json.cookies);
   } else {
     console.error("No URL found in JSON data.");
     return;
