@@ -33,20 +33,42 @@ export function optionWasSetLocally(name: string) {
   return mpv.getFlag(`"option-info/${name}/set-locally"`);
 }
 
-export function setHTTPHeaders(headers?: Record<string, string>) {
-  if (!headers) return;
+const COOKIE_DIRECTIVE_RE = /^(?:domain|path|expires|max-age|secure|httponly|samesite)(?:=|$)/i;
 
-  const ua = headers["User-Agent"];
+function cleanCookie(raw?: string): string | undefined {
+  if (!raw) return undefined;
+  const cleaned = raw
+    .split(/[;\r\n]+/)
+    .map((s) => s.trim().replace(/^([^=]+=)"(.*)"$/, "$1$2"))
+    .filter((s) => s && !COOKIE_DIRECTIVE_RE.test(s))
+    .join("; ");
+  return cleaned || undefined;
+}
+
+export function setHTTPHeaders(headers?: Record<string, string>, cookies?: string) {
+  if (!headers && !cookies) return;
+
+  const ua = headers?.["User-Agent"];
   if (ua && !optionWasSet("user-agent")) {
     mpv.set("file-local-options/user-agent", ua);
   }
 
   const mpvHeaders: string[] = [];
-  for (const extraField of ["Cookie", "Referer", "X-Forwarded-For"]) {
-    const value = headers[extraField];
+  for (const extraField of ["Referer", "X-Forwarded-For"]) {
+    const value = headers?.[extraField];
     if (value) {
       mpvHeaders.push(`${extraField}: ${value}`);
     }
+  }
+
+  const rawCookie = cookies
+    ? headers?.["Cookie"]
+      ? `${cookies}; ${headers["Cookie"]}`
+      : cookies
+    : headers?.["Cookie"];
+  const cookie = cleanCookie(rawCookie);
+  if (cookie) {
+    mpvHeaders.push(`Cookie: ${cookie}`);
   }
 
   if (mpvHeaders.length > 0 && !optionWasSet("http-header-fields")) {
