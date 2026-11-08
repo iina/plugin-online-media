@@ -58,7 +58,8 @@ export async function runYTDLHook(url: string) {
   const includeSubs = opt.includeSubs;
   const includeAutoSubs = includeSubs && opt.includeAutoSubs;
 
-  rawOptions.split(" ").forEach((rawArg, index) => {
+  const rawArgs = rawOptions.split(" ").filter((a) => a);
+  rawArgs.forEach((rawArg, index) => {
     let arg = rawArg;
     if (rawArg.includes("—")) {
       arg = rawArg.replace("—", "--");
@@ -69,12 +70,12 @@ export async function runYTDLHook(url: string) {
       let argValue: string;
       // handle both --arg=value and --arg value cases
       if (arg.includes("=")) {
-        const splitted = arg.split("=");
-        argName = splitted[0];
-        argValue = splitted[1];
+        const eq = arg.indexOf("=");
+        argName = arg.substring(2, eq);
+        argValue = arg.substring(eq + 1);
       } else {
         argName = arg.substring(2);
-        argValue = rawOptions[index + 1];
+        argValue = rawArgs[index + 1];
       }
       if (["sub-lang", "sub-langs", "srt-lang"].includes(argName) && argValue) {
         allsubs = false;
